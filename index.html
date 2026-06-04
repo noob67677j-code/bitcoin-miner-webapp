@@ -163,20 +163,17 @@
     </header>
 
     <div class="main-content">
-        <!-- КЛИКЕР -->
         <div id="screen-clicker" class="screen active">
             <div class="click-btn" onclick="handleClick(event)"><span class="material-symbols-rounded">touch_app</span></div>
             <div class="energy-container"><div class="energy-bar" id="energy-bar"></div></div>
             <div class="energy-text"><span class="material-symbols-rounded" style="font-size: 15px; color: var(--md-sys-color-primary)">bolt</span><span id="energy-val">100</span> / 100</div>
         </div>
 
-        <!-- ФЕРМА -->
         <div id="screen-farm" class="screen">
             <div class="farm-header">Занято слотов: <span id="farm-slots" style="color:#fff; font-weight:500;">0/5</span></div>
             <div class="slots-grid" id="slots-grid"></div>
         </div>
 
-        <!-- ПРОКАЧКА -->
         <div id="screen-upgrades" class="screen">
             <div class="sub-nav">
                 <button class="sub-nav-btn active" id="sub-btn-gpus" onclick="switchSubTab('gpus')">Видеокарты</button>
@@ -202,7 +199,6 @@
             </div>
         </div>
 
-        <!-- КЕЙСЫ -->
         <div id="screen-cases" class="screen">
             <div class="case-menu-card">
                 <div class="case-title">Случайный Hardware Кейс</div>
@@ -224,7 +220,6 @@
         </div>
     </div>
 
-    <!-- КОНТРОЛЛЕРЫ -->
     <div class="controls-panel">
         <nav class="bottom-bar">
             <div class="nav-item active" onclick="switchScreen('clicker', this)"><div class="nav-icon-wrapper"><span class="material-symbols-rounded">ads_click</span></div><div class="nav-label">Кликер</div></div>
@@ -241,7 +236,7 @@
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
 
-        // ⚠️ ЗАМЕНИ НА IP СВОЕГО Flask-СЕРВЕРА ПРИ РАЗВЕРТЫВАНИИ (Например: http://192.168.1.50:5000)
+        // Авто-настройка URL бэкенда
         const serverUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') 
             ? 'http://127.0.0.1:5000' 
             : window.location.origin;
@@ -336,29 +331,51 @@
             if (isRolling) return;
             if (btc < 45) { tg.showAlert("Недостаточно средств (Нужно 45 BTC)"); return; }
             if (gpuInventory.length >= maxSlots) { tg.showAlert("Нет свободных слотов!"); return; }
-            isRolling = true; document.getElementById('btn-open-case').disabled = true;
+            
+            isRolling = true; 
+            document.getElementById('btn-open-case').disabled = true;
+            
             try {
-                let res = await fetch(`${serverUrl}/open_case', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId })
+                let res = await fetch(`${serverUrl}/open_case`, {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ user_id: userId })
                 });
                 let data = await res.json();
+                
                 if (data.status === 'success') {
-                    btc = data.current_btc; gpuInventory = data.current_inventory.split(',').map(Number);
+                    btc = data.current_btc; 
+                    gpuInventory = data.current_inventory.split(',').map(Number);
                     let winningIdx = data.won_gpu_idx;
+                    
                     buildRouletteTape(winningIdx);
-                    const itemWidth = 98; const wrapperCenter = 160; const stopPosition = -((28 * itemWidth) - wrapperCenter + (itemWidth / 2));
+                    
+                    const itemWidth = 98; 
+                    const wrapperCenter = 160; 
+                    const stopPosition = -((28 * itemWidth) - wrapperCenter + (itemWidth / 2));
                     const track = document.getElementById('roulette-track');
+                    
                     setTimeout(() => {
                         track.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.6, 0.1, 1)';
                         track.style.transform = `translateX(${stopPosition}px)`;
                     }, 50);
+                    
                     setTimeout(() => {
                         if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                         tg.showAlert(`🎉 Выпало устройство: ${gpuList[winningIdx].name}!`);
-                        isRolling = false; document.getElementById('btn-open-case').disabled = false; updateUI();
+                        isRolling = false; 
+                        document.getElementById('btn-open-case').disabled = false; 
+                        updateUI();
                     }, 3700);
-                } else { tg.showAlert(data.message); isRolling = false; document.getElementById('btn-open-case').disabled = false; }
-            } catch (e) { isRolling = false; document.getElementById('btn-open-case').disabled = false; }
+                } else { 
+                    tg.showAlert(data.message); 
+                    isRolling = false; 
+                    document.getElementById('btn-open-case').disabled = false; 
+                }
+            } catch (e) { 
+                isRolling = false; 
+                document.getElementById('btn-open-case').disabled = false; 
+            }
         }
 
         function calculatePassiveIncome() { return gpuInventory.reduce((sum, idx) => sum + gpuList[idx].income, 0); }
@@ -417,7 +434,7 @@
         function buyGPU(idx) { let price = getGpuPrice(idx); if (btc >= price && gpuInventory.length < maxSlots) { btc -= price; gpuInventory.push(idx); gpuBuyCounts[idx]++; updateUI(); saveData(); } }
         function confirmDeleteGPU(inventoryIndex, gpuName) { tg.showConfirm(`Удалить ${gpuName}?`, (ok) => { if (ok) { gpuInventory.splice(inventoryIndex, 1); updateUI(); saveData(); } }); }
         function buyClickUpgrade() { let p = 15 + (clickPower - 0.5) * 60; if (btc >= p) { btc -= p; clickPower += 0.2; updateUI(); saveData(); } }
-        function upgradeSlots() { let p = 50 + (maxSlots - 5) * 125; if (btc >= p && maxSlots < 15) { btc -= p; maxSlots++; updateUI(); saveData(); } }
+        function upgradeSlots() { let p = 50 + (maxSlots - 5) * 125; if (btc >= p && maxSlots < 15) { btc -= p; maxSlots++; updateUI(); updateUI(); saveData(); } }
 
         setInterval(() => {
             btc += calculatePassiveIncome();
@@ -428,7 +445,7 @@
         }, 1000);
 
         setInterval(() => { if (hasAutoclicker === 1 && energy >= 2) { energy -= 2; btc += clickPower; } }, 2000);
-        setInterval(saveData, 15000); // Резервное автосохранение
+        setInterval(saveData, 15000); 
         loadData();
     </script>
 </body>
