@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitcoin Miner Tycoon Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght=400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <style>
         :root {
             --md-sys-color-background: #141218;
@@ -92,7 +92,7 @@
         .upgrade-btn { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border: none; padding: 10px 14px; border-radius: 20px; font-weight: 500; font-size: 13px; cursor: pointer; white-space: nowrap; }
         .upgrade-btn:disabled { background: var(--md-sys-color-surface-variant); color: #777; cursor: not-allowed; }
 
-        /* КЕЙСЫ И РУЛЕТКА */
+        /* КЕЙСЫ */
         .case-menu-card {
             background: var(--md-sys-color-surface); padding: 20px; border-radius: 24px;
             border: 1px solid var(--md-sys-color-surface-variant); text-align: center; margin-bottom: 20px;
@@ -224,34 +224,7 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready(); tg.expand();
-
-        // Настройка главной кнопки Telegram (MainButton)
-        tg.MainButton.setText("💾 СОХРАНИТЬ И ВЫЙТИ");
-        tg.MainButton.setTextColor("#141218");
-        tg.MainButton.setBackgroundColor("#ffb4ab"); // Цвет var(--md-sys-color-error)
-        tg.MainButton.show();
-
-        // Клик по кнопке ТГ вызывает отправку данных боту
-        tg.MainButton.onClick(function() {
-            if (isRolling) return;
-            
-            // Собираем весь игровой прогресс в один компактный объект
-            let savePayload = {
-                btc: parseFloat(btc),
-                gpu_inventory: gpuInventory.join(','),
-                gpu_buy_counts: gpuBuyCounts.join(','),
-                max_slots: parseInt(maxSlots),
-                click_power: parseFloat(clickPower),
-                energy: parseFloat(energy),
-                has_autoclicker: parseInt(hasAutoclicker)
-            };
-            
-            // Отправляем данные напрямую боту и закрываем окно!
-            tg.sendData(JSON.stringify(savePayload));
-        });
-
+        // ИНИЦИАЛИЗАЦИЯ ПЕРЕМЕННЫХ ДО ВЫЗОВА ФУНКЦИЙ (Защита от сбоев)
         const gpuList = [
             { name: "GTX 1660", income: 0.1, basePrice: 10, icon: "hardware" },
             { name: "RTX 3060", income: 0.4, basePrice: 45, icon: "memory" },
@@ -262,10 +235,31 @@
 
         let btc = 0; let gpuInventory = []; let maxSlots = 5; let clickPower = 0.5; let energy = 100; let gpuBuyCounts = [0, 0, 0, 0, 0]; let hasAutoclicker = 0; let isRolling = false;
 
-        // ПОЛУЧЕНИЕ ДАННЫХ ИЗ ССЫЛКИ СТАРТА (Переданных ботом)
+        const tg = window.Telegram.WebApp;
+        tg.ready(); tg.expand();
+
+        // ЖЕЛЕЗОБЕТОННАЯ НАСТРОЙКА КНОПКИ (Показывается только в Telegram)
+        tg.MainButton.setParams({
+            text: "💾 СОХРАНИТЬ И ВЫЙТИ",
+            color: "#ffb4ab",
+            text_color: "#141218",
+            is_active: true,
+            is_visible: true
+        });
+
+        // Клик по главной кнопке
+        tg.MainButton.onClick(function() {
+            if (isRolling) return;
+            let savePayload = {
+                btc: parseFloat(btc), gpu_inventory: gpuInventory.join(','), gpu_buy_counts: gpuBuyCounts.join(','),
+                max_slots: parseInt(maxSlots), click_power: parseFloat(clickPower), energy: parseFloat(energy), has_autoclicker: parseInt(hasAutoclicker)
+            };
+            tg.sendData(JSON.stringify(savePayload));
+        });
+
+        // ПАРСИНГ ДАННЫХ ИЗ URL
         function parseInitData() {
             try {
-                // Ищем параметры, которые бот передал в URL игры
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('btc')) btc = parseFloat(urlParams.get('btc'));
                 if (urlParams.has('max_slots')) maxSlots = parseInt(urlParams.get('max_slots'));
@@ -279,19 +273,17 @@
                 let buyRaw = urlParams.get('gpu_buy_counts');
                 gpuBuyCounts = buyRaw ? buyRaw.split('.').map(Number) : [0,0,0,0,0];
                 
-                // Проверка офлайн дохода
                 let offlineEarnings = parseFloat(urlParams.get('offline_earnings')) || 0;
                 let offlineText = urlParams.get('offline_time') || "";
                 if (offlineEarnings > 0) {
                     btc += offlineEarnings;
-                    setTimeout(() => {
-                        tg.showAlert(`С возвращением!\nФерма намайнила: ${offlineEarnings.toFixed(2)} BTC за ${decodeURIComponent(offlineText)}`);
-                    }, 500);
+                    setTimeout(() => { tg.showAlert(`С возвращением!\nФерма намайнила: ${offlineEarnings.toFixed(2)} BTC за ${decodeURIComponent(offlineText)}`); }, 500);
                 }
-            } catch(e) { console.error("Ошибка парсинга даты:", e); }
+            } catch(e) { console.error(e); }
             updateUI();
         }
 
+        // ЛОГИКА ИНТЕРФЕЙСА
         function switchScreen(screenId, el) {
             if (isRolling) return;
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -328,38 +320,25 @@
             if (btc < 45) { tg.showAlert("Недостаточно средств (Нужно 45 BTC)"); return; }
             if (gpuInventory.length >= maxSlots) { tg.showAlert("Нет свободных слотов!"); return; }
             
-            isRolling = true; 
-            document.getElementById('btn-open-case').disabled = true;
+            isRolling = true; document.getElementById('btn-open-case').disabled = true;
             
             let rand = Math.floor(Math.random() * 100) + 1;
             let winningIdx = 0;
-            if (rand <= 55) winningIdx = 0;
-            else if (rand <= 55 + 27) winningIdx = 1;
-            else if (rand <= 55 + 27 + 12) winningIdx = 2;
-            else if (rand <= 55 + 27 + 12 + 5) winningIdx = 3;
-            else winningIdx = 4;
+            if (rand <= 55) winningIdx = 0; else if (rand <= 82) winningIdx = 1; else if (rand <= 94) winningIdx = 2; else if (rand <= 99) winningIdx = 3; else winningIdx = 4;
             
-            btc -= 45;
-            gpuInventory.push(winningIdx);
-            
+            btc -= 45; gpuInventory.push(winningIdx);
             buildRouletteTape(winningIdx);
             
-            const itemWidth = 98; 
-            const wrapperCenter = 160; 
-            const stopPosition = -((28 * itemWidth) - wrapperCenter + (itemWidth / 2));
             const track = document.getElementById('roulette-track');
-            
             setTimeout(() => {
                 track.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.6, 0.1, 1)';
-                track.style.transform = `translateX(${stopPosition}px)`;
+                track.style.transform = `translateX(-2642px)`;
             }, 50);
             
             setTimeout(() => {
                 if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 tg.showAlert(`🎉 Выпало устройство: ${gpuList[winningIdx].name}!`);
-                isRolling = false; 
-                document.getElementById('btn-open-case').disabled = false; 
-                updateUI();
+                isRolling = false; document.getElementById('btn-open-case').disabled = false; updateUI();
             }, 3700);
         }
 
@@ -368,17 +347,16 @@
         function countGpuInInventory(idx) { return gpuInventory.filter(id => id === idx).length; }
 
         function updateUI() {
-            let passiveIncome = calculatePassiveIncome();
             document.getElementById('btc').innerText = btc.toFixed(2);
             document.getElementById('info-tap').innerText = `+${clickPower.toFixed(1)}`;
-            document.getElementById('info-pps').innerText = passiveIncome.toFixed(1);
+            document.getElementById('info-pps').innerText = calculatePassiveIncome().toFixed(1);
             document.getElementById('farm-slots').innerText = `${gpuInventory.length}/${maxSlots}`;
             
             const grid = document.getElementById('slots-grid'); grid.innerHTML = '';
             for(let i = 0; i < maxSlots; i++) {
                 const card = document.createElement('div');
                 if (i < gpuInventory.length) {
-                    let gpuIdx = gpuInventory[i]; let gpu = gpuList[gpuIdx];
+                    let gpu = gpuList[gpuInventory[i]];
                     card.className = 'slot-card active';
                     card.innerHTML = `<span class="material-symbols-rounded gpu-icon">${gpu.icon}</span><div class="gpu-meta"><div class="gpu-name">${gpu.name}</div><div class="gpu-profit">+${gpu.income} BTC/с</div></div><button class="delete-btn" onclick="confirmDeleteGPU(${i}, '${gpu.name}')"><span class="material-symbols-rounded">delete</span></button>`;
                 } else {
@@ -406,13 +384,7 @@
         }
 
         function handleClick(e) {
-            if (energy >= 2) {
-                energy -= 2; btc += clickPower;
-                document.getElementById('energy-val').innerText = Math.ceil(energy);
-                document.getElementById('energy-bar').style.width = `${energy}%`;
-                document.getElementById('btc').innerText = btc.toFixed(2);
-                if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-            }
+            if (energy >= 2) { energy -= 2; btc += clickPower; document.getElementById('energy-val').innerText = Math.ceil(energy); document.getElementById('energy-bar').style.width = `${energy}%`; document.getElementById('btc').innerText = btc.toFixed(2); if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); }
         }
 
         function buyAutoclicker() { if (btc >= 250 && hasAutoclicker === 0) { btc -= 250; hasAutoclicker = 1; updateUI(); } }
@@ -421,17 +393,9 @@
         function buyClickUpgrade() { let p = 15 + (clickPower - 0.5) * 60; if (btc >= p) { btc -= p; clickPower += 0.2; updateUI(); } }
         function upgradeSlots() { let p = 50 + (maxSlots - 5) * 125; if (btc >= p && maxSlots < 15) { btc -= p; maxSlots++; updateUI(); } }
 
-        setInterval(() => {
-            btc += calculatePassiveIncome();
-            if (energy < 100) energy = Math.min(100, energy + 3.33);
-            document.getElementById('btc').innerText = btc.toFixed(2);
-            document.getElementById('energy-val').innerText = Math.floor(energy);
-            document.getElementById('energy-bar').style.width = `${energy}%`;
-        }, 1000);
-
+        setInterval(() => { btc += calculatePassiveIncome(); if (energy < 100) energy = Math.min(100, energy + 3.33); document.getElementById('btc').innerText = btc.toFixed(2); document.getElementById('energy-val').innerText = Math.floor(energy); document.getElementById('energy-bar').style.width = `${energy}%`; }, 1000);
         setInterval(() => { if (hasAutoclicker === 1 && energy >= 2) { energy -= 2; btc += clickPower; } }, 2000);
         
-        // Старт инициализации параметров
         parseInitData();
     </script>
 </body>
