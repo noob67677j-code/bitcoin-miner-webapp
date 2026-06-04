@@ -43,7 +43,7 @@
         .stat-chip .label { color: var(--md-sys-color-on-surface-variant); }
         .stat-chip .val { font-weight: 500; color: #fff; }
 
-        .main-content { flex: 1; overflow-y: auto; padding: 10px 20px 100px 20px; }
+        .main-content { flex: 1; overflow-y: auto; padding: 10px 20px 180px 20px; }
         .screen { display: none; animation: fadeIn 0.25s ease; }
         .screen.active { display: block; }
 
@@ -104,19 +104,41 @@
         }
         .upgrade-btn:disabled { background: var(--md-sys-color-surface-variant); color: #777; cursor: not-allowed; }
 
-        /* НАВИГАЦИЯ */
+        /* ПАНЕЛЬ УПРАВЛЕНИЯ (НАВИГАЦИЯ + ВЫХОД) */
+        .controls-panel {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background-color: var(--md-sys-color-surface);
+            display: flex; flex-direction: column;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.4);
+            border-top: 1px solid rgba(255,255,255,0.04);
+            z-index: 1000;
+        }
+        
         nav.bottom-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
-            background-color: var(--md-sys-color-surface); display: flex;
+            height: 70px; display: flex;
             justify-content: space-around; align-items: center; padding: 0 10px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.03);
         }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--md-sys-color-on-surface-variant); cursor: pointer; flex: 1; height: 100%; }
-        .nav-icon-wrapper { padding: 4px 20px; border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s ease; margin-bottom: 4px; }
+        .nav-icon-wrapper { padding: 2px 18px; border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s ease; margin-bottom: 2px; }
         .nav-item.active .nav-icon-wrapper { background-color: var(--md-sys-color-secondary-container); }
         .nav-item.active { color: var(--md-sys-color-on-surface); font-weight: 500; }
-        .nav-item span.material-symbols-rounded { font-size: 24px; }
+        .nav-item span.material-symbols-rounded { font-size: 22px; }
         .nav-label { font-size: 11px; }
+
+        /* КНОПКА ВЫХОДА */
+        .exit-save-wrapper {
+            padding: 8px 16px 12px 16px;
+            background-color: var(--md-sys-color-surface);
+            border-top: 1px solid rgba(255,255,255,0.02);
+        }
+        .exit-save-btn {
+            width: 100%; background: var(--md-sys-color-error); color: #141218;
+            border: none; padding: 12px; border-radius: 14px; font-weight: 700;
+            font-size: 14px; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 180, 171, 0.15);
+            transition: background-color 0.2s;
+        }
+        .exit-save-btn:active { background: #ff988f; }
     </style>
 </head>
 <body>
@@ -200,24 +222,35 @@
         </div>
     </div>
 
-    <nav class="bottom-bar">
-        <div class="nav-item active" onclick="switchScreen('clicker', this)">
-            <div class="nav-icon-wrapper"><span class="material-symbols-rounded">ads_click</span></div>
-            <div class="nav-label">Кликер</div>
+    <div class="controls-panel">
+        <nav class="bottom-bar">
+            <div class="nav-item active" onclick="switchScreen('clicker', this)">
+                <div class="nav-icon-wrapper"><span class="material-symbols-rounded">ads_click</span></div>
+                <div class="nav-label">Кликер</div>
+            </div>
+            <div class="nav-item" onclick="switchScreen('farm', this)">
+                <div class="nav-icon-wrapper"><span class="material-symbols-rounded">dns</span></div>
+                <div class="nav-label">Ферма</div>
+            </div>
+            <div class="nav-item" onclick="switchScreen('upgrades', this)">
+                <div class="nav-icon-wrapper"><span class="material-symbols-rounded">upgrade</span></div>
+                <div class="nav-label">Прокачка</div>
+            </div>
+        </nav>
+        <div class="exit-save-wrapper">
+            <button class="exit-save-btn" onclick="exitAndSaveGame()">
+                <span class="material-symbols-rounded" style="font-size: 18px">logout</span>
+                Выйти и сохранить прогресс
+            </button>
         </div>
-        <div class="nav-item" onclick="switchScreen('farm', this)">
-            <div class="nav-icon-wrapper"><span class="material-symbols-rounded">dns</span></div>
-            <div class="nav-label">Ферма</div>
-        </div>
-        <div class="nav-item" onclick="switchScreen('upgrades', this)">
-            <div class="nav-icon-wrapper"><span class="material-symbols-rounded">upgrade</span></div>
-            <div class="nav-label">Прокачка</div>
-        </div>
-    </nav>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
+
+        // Отключаем встроенную кнопку закрытия Telegram WebApp (по возможности), чтобы мотивировать юзать нашу
+        if (tg.SettingsButton) tg.SettingsButton.hide();
 
         const userId = tg.initDataUnsafe?.user?.id || 12345;
 
@@ -286,30 +319,58 @@
             }
         }
 
-        async function saveData() {
-            try {
-                let currentUserId = parseInt(userId) || 12345;
-                let gpuInventoryStr = gpuInventory.length > 0 ? gpuInventory.join(',') : "";
-                let gpuBuyCountsStr = gpuBuyCounts.length > 0 ? gpuBuyCounts.join(',') : "0,0,0,0,0";
+        // Возвращает промис для железного контроля асинхронности
+        function saveData() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    let currentUserId = parseInt(userId) || 12345;
+                    let gpuInventoryStr = gpuInventory.length > 0 ? gpuInventory.join(',') : "";
+                    let gpuBuyCountsStr = gpuBuyCounts.length > 0 ? gpuBuyCounts.join(',') : "0,0,0,0,0";
 
-                let payload = {
-                    user_id: currentUserId,
-                    btc: parseFloat(btc), 
-                    gpu_inventory: gpuInventoryStr, 
-                    gpu_buy_counts: gpuBuyCountsStr,
-                    max_slots: parseInt(maxSlots), 
-                    click_power: parseFloat(clickPower), 
-                    energy: parseFloat(energy),
-                    has_autoclicker: parseInt(hasAutoclicker)
-                };
+                    let payload = {
+                        user_id: currentUserId,
+                        btc: parseFloat(btc), 
+                        gpu_inventory: gpuInventoryStr, 
+                        gpu_buy_counts: gpuBuyCountsStr,
+                        max_slots: parseInt(maxSlots), 
+                        click_power: parseFloat(clickPower), 
+                        energy: parseFloat(energy),
+                        has_autoclicker: parseInt(hasAutoclicker)
+                    };
 
-                await fetch('/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            } catch (e) {
-                console.error("Ошибка сохранения:", e);
+                    let res = await fetch('/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) resolve(true);
+                    else resolve(false);
+                } catch (e) {
+                    console.error("Ошибка сохранения:", e);
+                    resolve(false);
+                }
+            });
+        }
+
+        // ЖЕЛЕЗНЫЙ ВЫХОД ИЗ ИГРЫ С ГАРАНТИЕЙ СОХРАНЕНИЯ
+        async function exitAndSaveGame() {
+            // Меняем текст на кнопке, чтобы игрок видел процесс
+            const btn = document.querySelector('.exit-save-btn');
+            btn.disabled = true;
+            btn.style.backgroundColor = '#49454f';
+            btn.innerHTML = '<span class="material-symbols-rounded">sync</span> Сохранение...';
+
+            let isSaved = await saveData();
+            
+            if (isSaved) {
+                // Если бэкенд ответил "ОК", закрываем мини-апп
+                tg.close();
+            } else {
+                // Предотвращаем потерю данных, если лег сервер
+                btn.disabled = false;
+                btn.style.backgroundColor = 'var(--md-sys-color-error)';
+                btn.innerHTML = '<span class="material-symbols-rounded">error</span> Ошибка! Повторить';
+                tg.showAlert("Не удалось связаться с сервером обновлений. Попробуйте нажать кнопку выхода ещё раз.");
             }
         }
 
@@ -454,7 +515,7 @@
             if (btc >= price && currentSlots < 15) { btc -= price; maxSlots = currentSlots + 1; updateUI(); saveData(); }
         }
 
-        // Таймеры
+        // Основные циклы
         setInterval(() => {
             btc += calculatePassiveIncome();
             if (energy < 100) energy = Math.min(100, energy + (100 / 30));
@@ -465,7 +526,10 @@
         }, 1000);
 
         setInterval(runAutoclicker, 2000);
-        setInterval(saveData, 8000);
+        
+        // Фоновое автосохранение раз в 12 секунд (на всякий случай)
+        setInterval(saveData, 12000);
+        
         loadData();
     </script>
 </body>
