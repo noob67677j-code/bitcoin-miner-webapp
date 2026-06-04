@@ -31,36 +31,36 @@
             display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
-        header { padding: 20px 20px 10px 20px; text-align: center; background: linear-gradient(180deg, rgba(33,31,38,1) 0%, rgba(20,18,24,0) 100%); }
-        .balance-title { font-size: 13px; color: var(--md-sys-color-on-surface-variant); letter-spacing: 1px; text-transform: uppercase; }
-        .balance-value { font-size: 34px; font-weight: 700; color: var(--color-btc); margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        header { padding: 15px 20px 5px 20px; text-align: center; background: linear-gradient(180deg, rgba(33,31,38,1) 0%, rgba(20,18,24,0) 100%); }
+        .balance-title { font-size: 12px; color: var(--md-sys-color-on-surface-variant); letter-spacing: 1px; text-transform: uppercase; }
+        .balance-value { font-size: 32px; font-weight: 700; color: var(--color-btc); margin-top: 3px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         
-        .stats-strip { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
+        .stats-strip { display: flex; gap: 8px; margin-top: 10px; justify-content: center; }
         .stat-chip {
-            background: var(--md-sys-color-surface); padding: 8px 14px; border-radius: 12px;
-            font-size: 12px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.03);
+            background: var(--md-sys-color-surface); padding: 6px 12px; border-radius: 12px;
+            font-size: 11px; display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.03);
         }
         .stat-chip .label { color: var(--md-sys-color-on-surface-variant); }
         .stat-chip .val { font-weight: 500; color: #fff; }
 
-        .main-content { flex: 1; overflow-y: auto; padding: 10px 20px 180px 20px; }
+        .main-content { flex: 1; overflow-y: auto; padding: 10px 20px 210px 20px; }
         .screen { display: none; animation: fadeIn 0.25s ease; }
         .screen.active { display: block; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
         /* КЛИКЕР */
-        #screen-clicker { text-align: center; padding-top: 30px; }
+        #screen-clicker { text-align: center; padding-top: 20px; }
         .click-btn {
-            width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle, #f5b942 0%, #f2a900 100%);
+            width: 190px; height: 190px; border-radius: 50%; background: radial-gradient(circle, #f5b942 0%, #f2a900 100%);
             box-shadow: 0 12px 35px rgba(242, 169, 0, 0.25), inset 0 -8px 15px rgba(0,0,0,0.2);
-            border: 6px solid var(--md-sys-color-surface); margin: 0 auto 35px auto;
+            border: 6px solid var(--md-sys-color-surface); margin: 0 auto 25px auto;
             display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.05s ease;
         }
         .click-btn:active { transform: scale(0.94); }
-        .click-btn span { font-size: 85px; color: #141218; }
+        .click-btn span { font-size: 75px; color: #141218; }
         
-        .energy-container { width: 100%; max-width: 280px; margin: 0 auto; background: var(--md-sys-color-surface-variant); height: 10px; border-radius: 5px; overflow: hidden; }
+        .energy-container { width: 100%; max-width: 250px; margin: 0 auto; background: var(--md-sys-color-surface-variant); height: 10px; border-radius: 5px; overflow: hidden; }
         .energy-bar { height: 100%; background: var(--md-sys-color-primary); width: 100%; transition: width 0.1s linear; }
         .energy-text { font-size: 13px; margin-top: 8px; color: var(--md-sys-color-on-surface-variant); display: flex; align-items: center; justify-content: center; gap: 4px; }
 
@@ -77,12 +77,7 @@
         .slot-card .gpu-meta { flex: 1; }
         .slot-card .gpu-name { font-weight: 500; font-size: 15px; }
         .slot-card .gpu-profit { font-size: 12px; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
-        
-        .delete-btn {
-            background: none; border: none; color: var(--md-sys-color-error); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 50%;
-        }
-        .delete-btn:active { background: rgba(255, 180, 171, 0.1); }
+        .delete-btn { background: none; border: none; color: var(--md-sys-color-error); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 50%; }
 
         /* ПРОКАЧКА */
         .sub-nav { display: flex; background: var(--md-sys-color-surface); padding: 4px; border-radius: 12px; margin-bottom: 15px; gap: 2px; }
@@ -90,55 +85,67 @@
         .sub-nav-btn.active { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-secondary-container); }
         
         .upgrade-list { display: flex; flex-direction: column; gap: 10px; }
-        .upgrade-card {
-            display: flex; align-items: center; justify-content: space-between;
-            background: var(--md-sys-color-surface); padding: 14px 16px; border-radius: 16px;
-            border: 1px solid var(--md-sys-color-surface-variant);
-        }
+        .upgrade-card { display: flex; align-items: center; justify-content: space-between; background: var(--md-sys-color-surface); padding: 14px 16px; border-radius: 16px; border: 1px solid var(--md-sys-color-surface-variant); }
         .upgrade-info { display: flex; flex-direction: column; gap: 3px; max-width: 65%; }
         .upgrade-title { font-weight: 500; font-size: 15px; }
         .upgrade-desc { font-size: 12px; color: var(--md-sys-color-on-surface-variant); }
-        .upgrade-btn {
-            background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
-            border: none; padding: 10px 14px; border-radius: 20px; font-weight: 500; font-size: 13px; cursor: pointer; white-space: nowrap;
-        }
+        .upgrade-btn { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border: none; padding: 10px 14px; border-radius: 20px; font-weight: 500; font-size: 13px; cursor: pointer; white-space: nowrap; }
         .upgrade-btn:disabled { background: var(--md-sys-color-surface-variant); color: #777; cursor: not-allowed; }
 
-        /* ПАНЕЛЬ УПРАВЛЕНИЯ (НАВИГАЦИЯ + ВЫХОД) */
+        /* КЕЙСЫ И РУЛЕТКА */
+        .case-menu-card {
+            background: var(--md-sys-color-surface); padding: 20px; border-radius: 24px;
+            border: 1px solid var(--md-sys-color-surface-variant); text-align: center; margin-bottom: 20px;
+        }
+        .case-title { font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+        .case-price-tag { color: var(--color-btc); font-weight: 500; margin-bottom: 15px; font-size: 14px; }
+
+        .roulette-wrapper {
+            position: relative; width: 100%; max-width: 320px; height: 110px;
+            margin: 15px auto; background: #1a181f; border-radius: 16px;
+            overflow: hidden; border: 2px solid var(--md-sys-color-surface-variant);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .roulette-wrapper::before, .roulette-wrapper::after { content: ''; position: absolute; top: 0; bottom: 0; width: 40px; z-index: 5; pointer-events: none; }
+        .roulette-wrapper::before { left: 0; background: linear-gradient(90deg, #1a181f 0%, rgba(26,24,31,0) 100%); }
+        .roulette-wrapper::after { right: 0; background: linear-gradient(-90deg, #1a181f 0%, rgba(26,24,31,0) 100%); }
+        
+        .roulette-pointer { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: var(--md-sys-color-error); transform: translateX(-50%); z-index: 10; box-shadow: 0 0 10px var(--md-sys-color-error); }
+        .roulette-track { display: flex; position: absolute; left: 0; top: 10px; height: 90px; will-change: transform; transform: translateX(0px); }
+        .roulette-item { width: 90px; height: 90px; background: var(--md-sys-color-surface); margin: 0 4px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.05); gap: 5px; }
+        .roulette-item span { font-size: 26px; }
+        .roulette-item .item-name { font-size: 10px; font-weight: 500; text-align: center; max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .tier-0 { border-bottom: 4px solid #90caf9; }
+        .tier-1 { border-bottom: 4px solid #a5d6a7; } 
+        .tier-2 { border-bottom: 4px solid #fff59d; } 
+        .tier-3 { border-bottom: 4px solid #ffb74d; } 
+        .tier-4 { border-bottom: 4px solid #f48fb1; }
+
+        .drop-chances { margin-top: 20px; text-align: left; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; }
+        .drop-chances-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--md-sys-color-on-surface-variant); margin-bottom: 6px; }
+        .chance-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: var(--md-sys-color-on-surface-variant); }
+        .chance-row span.name { color: #fff; }
+
+        /* НАВИГАЦИЯ И КНОПКА ВЫХОДА */
         .controls-panel {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background-color: var(--md-sys-color-surface);
-            display: flex; flex-direction: column;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.4);
-            border-top: 1px solid rgba(255,255,255,0.04);
-            z-index: 1000;
+            background-color: var(--md-sys-color-surface); display: flex; flex-direction: column;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.04); z-index: 1000;
         }
-        
-        nav.bottom-bar {
-            height: 70px; display: flex;
-            justify-content: space-around; align-items: center; padding: 0 10px;
-        }
+        nav.bottom-bar { height: 65px; display: flex; justify-content: space-around; align-items: center; padding: 0 5px; }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--md-sys-color-on-surface-variant); cursor: pointer; flex: 1; height: 100%; }
-        .nav-icon-wrapper { padding: 2px 18px; border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s ease; margin-bottom: 2px; }
+        .nav-icon-wrapper { padding: 2px 14px; border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s ease; margin-bottom: 2px; }
         .nav-item.active .nav-icon-wrapper { background-color: var(--md-sys-color-secondary-container); }
         .nav-item.active { color: var(--md-sys-color-on-surface); font-weight: 500; }
         .nav-item span.material-symbols-rounded { font-size: 22px; }
-        .nav-label { font-size: 11px; }
+        .nav-label { font-size: 10px; }
 
-        /* КНОПКА ВЫХОДА */
-        .exit-save-wrapper {
-            padding: 8px 16px 12px 16px;
-            background-color: var(--md-sys-color-surface);
-            border-top: 1px solid rgba(255,255,255,0.02);
-        }
+        .exit-save-wrapper { padding: 6px 16px 10px 16px; background-color: var(--md-sys-color-surface); border-top: 1px solid rgba(255,255,255,0.02); }
         .exit-save-btn {
-            width: 100%; background: var(--md-sys-color-error); color: #141218;
-            border: none; padding: 12px; border-radius: 14px; font-weight: 700;
-            font-size: 14px; cursor: pointer; display: flex; align-items: center;
-            justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 180, 171, 0.15);
-            transition: background-color 0.2s;
+            width: 100%; background: var(--md-sys-color-error); color: #141218; border: none; padding: 11px; border-radius: 12px; font-weight: 700;
+            font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 180, 171, 0.15);
         }
-        .exit-save-btn:active { background: #ff988f; }
     </style>
 </head>
 <body>
@@ -150,98 +157,83 @@
             <span id="btc">0.00</span>
         </div>
         <div class="stats-strip">
-            <div class="stat-chip">
-                <span class="material-symbols-rounded" style="font-size:14px; color:var(--color-btc)">bolt</span>
-                <span class="label">Тап:</span>
-                <span class="val" id="info-tap">+0.5</span>
-            </div>
-            <div class="stat-chip">
-                <span class="material-symbols-rounded" style="font-size:14px; color:var(--md-sys-color-primary)">memory</span>
-                <span class="label">В сек:</span>
-                <span class="val" id="info-pps">0.0</span>
-            </div>
+            <div class="stat-chip"><span class="material-symbols-rounded" style="font-size:13px; color:var(--color-btc)">bolt</span><span class="label">Тап:</span><span class="val" id="info-tap">+0.5</span></div>
+            <div class="stat-chip"><span class="material-symbols-rounded" style="font-size:13px; color:var(--md-sys-color-primary)">memory</span><span class="label">В сек:</span><span class="val" id="info-pps">0.0</span></div>
         </div>
     </header>
 
     <div class="main-content">
+        <!-- КЛИКЕР -->
         <div id="screen-clicker" class="screen active">
-            <div class="click-btn" onclick="handleClick(event)">
-                <span class="material-symbols-rounded">touch_app</span>
-            </div>
-            <div class="energy-container">
-                <div class="energy-bar" id="energy-bar"></div>
-            </div>
-            <div class="energy-text">
-                <span class="material-symbols-rounded" style="font-size: 15px; color: var(--md-sys-color-primary)">bolt</span>
-                <span id="energy-val">100</span> / 100
-            </div>
+            <div class="click-btn" onclick="handleClick(event)"><span class="material-symbols-rounded">touch_app</span></div>
+            <div class="energy-container"><div class="energy-bar" id="energy-bar"></div></div>
+            <div class="energy-text"><span class="material-symbols-rounded" style="font-size: 15px; color: var(--md-sys-color-primary)">bolt</span><span id="energy-val">100</span> / 100</div>
         </div>
 
+        <!-- ФЕРМА -->
         <div id="screen-farm" class="screen">
-            <div class="farm-header">
-                Занято слотов: <span id="farm-slots" style="color:#fff; font-weight:500;">0/5</span>
-            </div>
+            <div class="farm-header">Занято слотов: <span id="farm-slots" style="color:#fff; font-weight:500;">0/5</span></div>
             <div class="slots-grid" id="slots-grid"></div>
         </div>
 
+        <!-- ПРОКАЧКА -->
         <div id="screen-upgrades" class="screen">
             <div class="sub-nav">
                 <button class="sub-nav-btn active" id="sub-btn-gpus" onclick="switchSubTab('gpus')">Видеокарты</button>
                 <button class="sub-nav-btn" id="sub-btn-income" onclick="switchSubTab('income')">Заработок</button>
                 <button class="sub-nav-btn" id="sub-btn-slots" onclick="switchSubTab('slots')">Слоты</button>
             </div>
-
             <div id="tab-gpus" class="upgrade-list"></div>
-
             <div id="tab-income" class="upgrade-list" style="display: none;">
                 <div class="upgrade-card">
-                    <div class="upgrade-info">
-                        <div class="upgrade-title">Улучшить Тап</div>
-                        <div class="upgrade-desc">Сила клика: +0.2 BTC</div>
-                    </div>
+                    <div class="upgrade-info"><div class="upgrade-title">Улучшить Тап</div><div class="upgrade-desc">Сила клика: +0.2 BTC</div></div>
                     <button class="upgrade-btn" id="btn-buy-click" onclick="buyClickUpgrade()">15 BTC</button>
                 </div>
                 <div class="upgrade-card">
-                    <div class="upgrade-info">
-                        <div class="upgrade-title">Нанять Сисадмина</div>
-                        <div class="upgrade-desc" id="autoclicker-desc">Авто-клик каждые 2 сек (Тратит по 2 энергии)</div>
-                    </div>
+                    <div class="upgrade-info"><div class="upgrade-title">Нанять Сисадмина</div><div class="upgrade-desc" id="autoclicker-desc">Авто-клик каждые 2 сек</div></div>
                     <button class="upgrade-btn" id="btn-buy-autoclicker" onclick="buyAutoclicker()">250 BTC</button>
                 </div>
             </div>
-
             <div id="tab-slots" class="upgrade-list" style="display: none;">
                 <div class="upgrade-card">
-                    <div class="upgrade-info">
-                        <div class="upgrade-title">Добавить слот</div>
-                        <div class="upgrade-desc">Максимум 15 слотов</div>
-                    </div>
+                    <div class="upgrade-info"><div class="upgrade-title">Добавить слот</div><div class="upgrade-desc">Максимум 15 слотов</div></div>
                     <button class="upgrade-btn" id="btn-upgrade-slots" onclick="upgradeSlots()">50 BTC</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- КЕЙСЫ -->
+        <div id="screen-cases" class="screen">
+            <div class="case-menu-card">
+                <div class="case-title">Случайный Hardware Кейс</div>
+                <div class="case-price-tag">Стоимость открытия: 45.00 BTC</div>
+                <div class="roulette-wrapper">
+                    <div class="roulette-pointer"></div>
+                    <div class="roulette-track" id="roulette-track"></div>
+                </div>
+                <button class="upgrade-btn" id="btn-open-case" onclick="openGpuCase()" style="padding: 13px; font-size:14px; border-radius:20px; margin-top:10px; width:100%">Открыть Кейс</button>
+                <div class="drop-chances">
+                    <div class="drop-chances-title">Шансы выпадения устройств:</div>
+                    <div class="chance-row"><span class="name">GTX 1660 (Обычная)</span><span>55%</span></div>
+                    <div class="chance-row"><span class="name">RTX 3060 (Редкая)</span><span>27%</span></div>
+                    <div class="chance-row"><span class="name">RTX 4060 (Эпическая)</span><span>12%</span></div>
+                    <div class="chance-row"><span class="name">RTX 4090 (Легендарная)</span><span>5%</span></div>
+                    <div class="chance-row"><span class="name">Antminer S19 (Имперская)</span><span>1%</span></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- КОНТРОЛЛЕРЫ -->
     <div class="controls-panel">
         <nav class="bottom-bar">
-            <div class="nav-item active" onclick="switchScreen('clicker', this)">
-                <div class="nav-icon-wrapper"><span class="material-symbols-rounded">ads_click</span></div>
-                <div class="nav-label">Кликер</div>
-            </div>
-            <div class="nav-item" onclick="switchScreen('farm', this)">
-                <div class="nav-icon-wrapper"><span class="material-symbols-rounded">dns</span></div>
-                <div class="nav-label">Ферма</div>
-            </div>
-            <div class="nav-item" onclick="switchScreen('upgrades', this)">
-                <div class="nav-icon-wrapper"><span class="material-symbols-rounded">upgrade</span></div>
-                <div class="nav-label">Прокачка</div>
-            </div>
+            <div class="nav-item active" onclick="switchScreen('clicker', this)"><div class="nav-icon-wrapper"><span class="material-symbols-rounded">ads_click</span></div><div class="nav-label">Кликер</div></div>
+            <div class="nav-item" onclick="switchScreen('farm', this)"><div class="nav-icon-wrapper"><span class="material-symbols-rounded">dns</span></div><div class="nav-label">Ферма</div></div>
+            <div class="nav-item" onclick="switchScreen('upgrades', this)"><div class="nav-icon-wrapper"><span class="material-symbols-rounded">upgrade</span></div><div class="nav-label">Прокачка</div></div>
+            <div class="nav-item" onclick="switchScreen('cases', this)"><div class="nav-icon-wrapper"><span class="material-symbols-rounded">card_membership</span></div><div class="nav-label">Кейсы</div></div>
         </nav>
         <div class="exit-save-wrapper">
-            <button class="exit-save-btn" onclick="exitAndSaveGame()">
-                <span class="material-symbols-rounded" style="font-size: 18px">logout</span>
-                Выйти и сохранить прогресс
-            </button>
+            <button class="exit-save-btn" onclick="exitAndSaveGame()"><span class="material-symbols-rounded" style="font-size: 16px">logout</span> Выйти и сохранить прогресс</button>
         </div>
     </div>
 
@@ -249,8 +241,10 @@
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
 
-        // Отключаем встроенную кнопку закрытия Telegram WebApp (по возможности), чтобы мотивировать юзать нашу
-        if (tg.SettingsButton) tg.SettingsButton.hide();
+        // ⚠️ ЗАМЕНИ НА IP СВОЕГО Flask-СЕРВЕРА ПРИ РАЗВЕРТЫВАНИИ (Например: http://192.168.1.50:5000)
+        const serverUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') 
+            ? 'http://127.0.0.1:5000' 
+            : window.location.origin;
 
         const userId = tg.initDataUnsafe?.user?.id || 12345;
 
@@ -262,19 +256,15 @@
             { name: "Antminer S19", income: 10.0, basePrice: 1100, icon: "router" }
         ];
 
-        let btc = 0;
-        let gpuInventory = []; 
-        let maxSlots = 5;
-        let clickPower = 0.5;
-        let energy = 100;
-        let gpuBuyCounts = [0, 0, 0, 0, 0];
-        let hasAutoclicker = 0;
+        let btc = 0; let gpuInventory = []; let maxSlots = 5; let clickPower = 0.5; let energy = 100; let gpuBuyCounts = [0, 0, 0, 0, 0]; let hasAutoclicker = 0; let isRolling = false;
 
         function switchScreen(screenId, el) {
+            if (isRolling) return;
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`screen-${screenId}`).classList.add('active');
             el.classList.add('active');
+            if(screenId === 'cases') buildRouletteTape();
         }
 
         function switchSubTab(tabName) {
@@ -287,186 +277,135 @@
 
         async function loadData() {
             try {
-                let currentUserId = parseInt(userId) || 12345;
-                let response = await fetch(`/get_user?user_id=${currentUserId}`);
-                let data = await response.json();
-                
+                let res = await fetch(`${serverUrl}/get_user?user_id=${userId}`);
+                let data = await res.json();
                 btc = parseFloat(data.btc) || 0;
                 maxSlots = parseInt(data.max_slots) || 5;
                 clickPower = parseFloat(data.click_power) || 0.5;
                 energy = parseFloat(data.energy) || 100;
                 hasAutoclicker = parseInt(data.has_autoclicker) || 0;
-                
-                if (data.gpu_inventory && data.gpu_inventory.trim() !== "") {
-                    gpuInventory = data.gpu_inventory.split(',').map(Number);
-                } else {
-                    gpuInventory = [];
-                }
-                
-                if (data.gpu_buy_counts && data.gpu_buy_counts.trim() !== "") {
-                    gpuBuyCounts = data.gpu_buy_counts.split(',').map(Number);
-                } else {
-                    gpuBuyCounts = [0, 0, 0, 0, 0];
-                }
-                
+                gpuInventory = data.gpu_inventory ? data.gpu_inventory.split(',').map(Number) : [];
+                gpuBuyCounts = data.gpu_buy_counts ? data.gpu_buy_counts.split(',').map(Number) : [0,0,0,0,0];
                 updateUI();
-
                 if (data.offline_earnings && data.offline_earnings > 0) {
-                    tg.showAlert(`С возвращением!\nПока тебя не было, твоя ферма принесла: ${data.offline_earnings.toFixed(2)} BTC (за ${data.offline_time_text})`);
+                    tg.showAlert(`С возвращением!\nФерма намайнила: ${data.offline_earnings.toFixed(2)} BTC за ${data.offline_time_text}`);
                 }
-            } catch (e) { 
-                console.error("Ошибка загрузки:", e); 
-            }
+            } catch (e) { console.error("Ошибка загрузки:", e); }
         }
 
-        // Возвращает промис для железного контроля асинхронности
         function saveData() {
-            return new Promise(async (resolve, reject) => {
+            return new Promise(async (resolve) => {
                 try {
-                    let currentUserId = parseInt(userId) || 12345;
-                    let gpuInventoryStr = gpuInventory.length > 0 ? gpuInventory.join(',') : "";
-                    let gpuBuyCountsStr = gpuBuyCounts.length > 0 ? gpuBuyCounts.join(',') : "0,0,0,0,0";
-
                     let payload = {
-                        user_id: currentUserId,
-                        btc: parseFloat(btc), 
-                        gpu_inventory: gpuInventoryStr, 
-                        gpu_buy_counts: gpuBuyCountsStr,
-                        max_slots: parseInt(maxSlots), 
-                        click_power: parseFloat(clickPower), 
-                        energy: parseFloat(energy),
-                        has_autoclicker: parseInt(hasAutoclicker)
+                        user_id: userId, btc: parseFloat(btc), gpu_inventory: gpuInventory.join(','),
+                        gpu_buy_counts: gpuBuyCounts.join(','), max_slots: parseInt(maxSlots),
+                        click_power: parseFloat(clickPower), energy: parseFloat(energy), has_autoclicker: parseInt(hasAutoclicker)
                     };
-
-                    let res = await fetch('/save', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                    let res = await fetch(`${serverUrl}/save`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                     });
-                    if (res.ok) resolve(true);
-                    else resolve(false);
-                } catch (e) {
-                    console.error("Ошибка сохранения:", e);
-                    resolve(false);
-                }
+                    resolve(res.ok);
+                } catch (e) { resolve(false); }
             });
         }
 
-        // ЖЕЛЕЗНЫЙ ВЫХОД ИЗ ИГРЫ С ГАРАНТИЕЙ СОХРАНЕНИЯ
         async function exitAndSaveGame() {
-            // Меняем текст на кнопке, чтобы игрок видел процесс
+            if (isRolling) return;
             const btn = document.querySelector('.exit-save-btn');
-            btn.disabled = true;
-            btn.style.backgroundColor = '#49454f';
-            btn.innerHTML = '<span class="material-symbols-rounded">sync</span> Сохранение...';
+            btn.disabled = true; btn.style.backgroundColor = '#49454f'; btn.innerHTML = 'Сохранение...';
+            let success = await saveData();
+            if (success) tg.close();
+            else { btn.disabled = false; btn.style.backgroundColor = 'var(--md-sys-color-error)'; btn.innerHTML = 'Ошибка! Повторить'; }
+        }
 
-            let isSaved = await saveData();
-            
-            if (isSaved) {
-                // Если бэкенд ответил "ОК", закрываем мини-апп
-                tg.close();
-            } else {
-                // Предотвращаем потерю данных, если лег сервер
-                btn.disabled = false;
-                btn.style.backgroundColor = 'var(--md-sys-color-error)';
-                btn.innerHTML = '<span class="material-symbols-rounded">error</span> Ошибка! Повторить';
-                tg.showAlert("Не удалось связаться с сервером обновлений. Попробуйте нажать кнопку выхода ещё раз.");
+        function buildRouletteTape(winningGpuIdx = null) {
+            const track = document.getElementById('roulette-track');
+            track.style.transition = 'none'; track.style.transform = 'translateX(0px)'; track.innerHTML = '';
+            for (let i = 0; i < 35; i++) {
+                let randomIdx = Math.floor(Math.random() * gpuList.length);
+                if (i === 28 && winningGpuIdx !== null) randomIdx = winningGpuIdx;
+                let item = gpuList[randomIdx];
+                let card = document.createElement('div');
+                card.className = `roulette-item tier-${randomIdx}`;
+                card.innerHTML = `<span class="material-symbols-rounded">${item.icon}</span><div class="item-name">${item.name}</div>`;
+                track.appendChild(card);
             }
         }
 
-        function calculatePassiveIncome() {
-            return gpuInventory.reduce((sum, idx) => sum + gpuList[idx].income, 0);
+        async function openGpuCase() {
+            if (isRolling) return;
+            if (btc < 45) { tg.showAlert("Недостаточно средств (Нужно 45 BTC)"); return; }
+            if (gpuInventory.length >= maxSlots) { tg.showAlert("Нет свободных слотов!"); return; }
+            isRolling = true; document.getElementById('btn-open-case').disabled = true;
+            try {
+                let res = await fetch(`${serverUrl}/open_case', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId })
+                });
+                let data = await res.json();
+                if (data.status === 'success') {
+                    btc = data.current_btc; gpuInventory = data.current_inventory.split(',').map(Number);
+                    let winningIdx = data.won_gpu_idx;
+                    buildRouletteTape(winningIdx);
+                    const itemWidth = 98; const wrapperCenter = 160; const stopPosition = -((28 * itemWidth) - wrapperCenter + (itemWidth / 2));
+                    const track = document.getElementById('roulette-track');
+                    setTimeout(() => {
+                        track.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.6, 0.1, 1)';
+                        track.style.transform = `translateX(${stopPosition}px)`;
+                    }, 50);
+                    setTimeout(() => {
+                        if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                        tg.showAlert(`🎉 Выпало устройство: ${gpuList[winningIdx].name}!`);
+                        isRolling = false; document.getElementById('btn-open-case').disabled = false; updateUI();
+                    }, 3700);
+                } else { tg.showAlert(data.message); isRolling = false; document.getElementById('btn-open-case').disabled = false; }
+            } catch (e) { isRolling = false; document.getElementById('btn-open-case').disabled = false; }
         }
 
-        function getGpuPrice(idx) {
-            let counts = (gpuBuyCounts && gpuBuyCounts[idx] !== undefined) ? gpuBuyCounts[idx] : 0;
-            return Math.round(gpuList[idx].basePrice * Math.pow(1.15, counts));
-        }
-
-        function countGpuInInventory(idx) {
-            return gpuInventory.filter(id => id === idx).length;
-        }
+        function calculatePassiveIncome() { return gpuInventory.reduce((sum, idx) => sum + gpuList[idx].income, 0); }
+        function getGpuPrice(idx) { return Math.round(gpuList[idx].basePrice * Math.pow(1.15, gpuBuyCounts[idx] || 0)); }
+        function countGpuInInventory(idx) { return gpuInventory.filter(id => id === idx).length; }
 
         function updateUI() {
             let passiveIncome = calculatePassiveIncome();
             document.getElementById('btc').innerText = btc.toFixed(2);
-            
-            let currentPower = clickPower || 0.5;
-            document.getElementById('info-tap').innerText = `+${currentPower.toFixed(1)}`;
+            document.getElementById('info-tap').innerText = `+${clickPower.toFixed(1)}`;
             document.getElementById('info-pps').innerText = passiveIncome.toFixed(1);
-
-            let currentSlots = maxSlots || 5;
-            document.getElementById('farm-slots').innerText = `${gpuInventory.length}/${currentSlots}`;
+            document.getElementById('farm-slots').innerText = `${gpuInventory.length}/${maxSlots}`;
             
-            const grid = document.getElementById('slots-grid');
-            grid.innerHTML = '';
-            for(let i = 0; i < currentSlots; i++) {
+            const grid = document.getElementById('slots-grid'); grid.innerHTML = '';
+            for(let i = 0; i < maxSlots; i++) {
                 const card = document.createElement('div');
                 if (i < gpuInventory.length) {
-                    let gpuIdx = gpuInventory[i];
-                    let gpu = gpuList[gpuIdx];
+                    let gpuIdx = gpuInventory[i]; let gpu = gpuList[gpuIdx];
                     card.className = 'slot-card active';
-                    card.innerHTML = `
-                        <span class="material-symbols-rounded gpu-icon">${gpu.icon}</span>
-                        <div class="gpu-meta">
-                            <div class="gpu-name">${gpu.name}</div>
-                            <div class="gpu-profit">+${gpu.income} BTC/сек</div>
-                        </div>
-                        <button class="delete-btn" onclick="confirmDeleteGPU(${i}, '${gpu.name}')"><span class="material-symbols-rounded">delete</span></button>
-                    `;
+                    card.innerHTML = `<span class="material-symbols-rounded gpu-icon">${gpu.icon}</span><div class="gpu-meta"><div class="gpu-name">${gpu.name}</div><div class="gpu-profit">+${gpu.income} BTC/с</div></div><button class="delete-btn" onclick="confirmDeleteGPU(${i}, '${gpu.name}')"><span class="material-symbols-rounded">delete</span></button>`;
                 } else {
                     card.className = 'slot-card';
-                    card.innerHTML = `
-                        <span class="material-symbols-rounded gpu-icon">grid_view</span>
-                        <div class="gpu-meta"><div class="gpu-name" style="color:var(--md-sys-color-surface-variant)">Пустой слот</div></div>
-                    `;
+                    card.innerHTML = `<span class="material-symbols-rounded gpu-icon">grid_view</span><div class="gpu-meta"><div class="gpu-name" style="color:var(--md-sys-color-surface-variant)">Пустой слот</div></div>`;
                 }
                 grid.appendChild(card);
             }
 
-            const gpusTab = document.getElementById('tab-gpus');
-            gpusTab.innerHTML = '';
+            const gpusTab = document.getElementById('tab-gpus'); gpusTab.innerHTML = '';
             gpuList.forEach((gpu, idx) => {
                 let price = getGpuPrice(idx);
                 let isLocked = idx > 0 && countGpuInInventory(idx - 1) < 5;
-                let lockReason = `Нужно 5 шт. ${gpuList[idx-1]?.name} (Есть: ${countGpuInInventory(idx - 1)})`;
-                let isFull = gpuInventory.length >= currentSlots;
-
-                const card = document.createElement('div');
-                card.className = 'upgrade-card';
-                card.innerHTML = `
-                    <div class="upgrade-info">
-                        <div class="upgrade-title" style="${isLocked ? 'color:var(--md-sys-color-surface-variant)' : ''}">${gpu.name}</div>
-                        <div class="upgrade-desc">${isLocked ? lockReason : 'Доход: +' + gpu.income + ' BTC/сек'}</div>
-                    </div>
-                    <button class="upgrade-btn" ${isLocked || isFull ? 'disabled' : ''} onclick="buyGPU(${idx})">${isFull && !isLocked ? 'Нет мест' : price + ' BTC'}</button>
-                `;
+                let isFull = gpuInventory.length >= maxSlots;
+                const card = document.createElement('div'); card.className = 'upgrade-card';
+                card.innerHTML = `<div class="upgrade-info"><div class="upgrade-title" style="${isLocked ? 'color:var(--md-sys-color-surface-variant)' : ''}">${gpu.name}</div><div class="upgrade-desc">${isLocked ? 'Нужно 5 шт. предыдущих' : 'Доход: +' + gpu.income + ' BTC/с'}</div></div><button class="upgrade-btn" ${isLocked || isFull ? 'disabled' : ''} onclick="buyGPU(${idx})">${isFull && !isLocked ? 'Нет мест' : price + ' BTC'}</button>`;
                 gpusTab.appendChild(card);
             });
 
-            let clickPrice = 15 + (currentPower - 0.5) * 60;
-            document.getElementById('btn-buy-click').innerText = `${clickPrice.toFixed(0)} BTC`;
-
+            document.getElementById('btn-buy-click').innerText = `${(15 + (clickPower - 0.5) * 60).toFixed(0)} BTC`;
             let acBtn = document.getElementById('btn-buy-autoclicker');
-            let acDesc = document.getElementById('autoclicker-desc');
-            if (hasAutoclicker === 1) {
-                acBtn.disabled = true;
-                acBtn.innerText = "Нанят";
-                acDesc.innerText = "Сисадмин работает и активно кликает за вас!";
-            } else {
-                acBtn.disabled = false;
-                acBtn.innerText = "250 BTC";
-            }
-
-            let slotsPrice = 50 + (currentSlots - 5) * 125;
-            document.getElementById('btn-upgrade-slots').innerText = `${slotsPrice} BTC`;
-            document.getElementById('btn-upgrade-slots').disabled = currentSlots >= 15;
+            if (hasAutoclicker === 1) { acBtn.disabled = true; acBtn.innerText = "Нанят"; }
+            document.getElementById('btn-upgrade-slots').innerText = `${50 + (maxSlots - 5) * 125} BTC`;
+            document.getElementById('btn-upgrade-slots').disabled = maxSlots >= 15;
         }
 
         function handleClick(e) {
             if (energy >= 2) {
-                energy -= 2; 
-                btc += (clickPower || 0.5);
+                energy -= 2; btc += clickPower;
                 document.getElementById('energy-val').innerText = Math.ceil(energy);
                 document.getElementById('energy-bar').style.width = `${energy}%`;
                 document.getElementById('btc').innerText = btc.toFixed(2);
@@ -474,62 +413,22 @@
             }
         }
 
-        function runAutoclicker() {
-            if (hasAutoclicker === 1 && energy >= 2) {
-                energy -= 2;
-                btc += (clickPower || 0.5);
-                document.getElementById('energy-val').innerText = Math.ceil(energy);
-                document.getElementById('energy-bar').style.width = `${energy}%`;
-                document.getElementById('btc').innerText = btc.toFixed(2);
-            }
-        }
+        function buyAutoclicker() { if (btc >= 250 && hasAutoclicker === 0) { btc -= 250; hasAutoclicker = 1; updateUI(); saveData(); } }
+        function buyGPU(idx) { let price = getGpuPrice(idx); if (btc >= price && gpuInventory.length < maxSlots) { btc -= price; gpuInventory.push(idx); gpuBuyCounts[idx]++; updateUI(); saveData(); } }
+        function confirmDeleteGPU(inventoryIndex, gpuName) { tg.showConfirm(`Удалить ${gpuName}?`, (ok) => { if (ok) { gpuInventory.splice(inventoryIndex, 1); updateUI(); saveData(); } }); }
+        function buyClickUpgrade() { let p = 15 + (clickPower - 0.5) * 60; if (btc >= p) { btc -= p; clickPower += 0.2; updateUI(); saveData(); } }
+        function upgradeSlots() { let p = 50 + (maxSlots - 5) * 125; if (btc >= p && maxSlots < 15) { btc -= p; maxSlots++; updateUI(); saveData(); } }
 
-        function buyAutoclicker() {
-            if (btc >= 250 && hasAutoclicker === 0) {
-                btc -= 250; hasAutoclicker = 1; updateUI(); saveData();
-            }
-        }
-
-        function buyGPU(idx) {
-            let price = getGpuPrice(idx);
-            if (btc >= price && gpuInventory.length < maxSlots) {
-                btc -= price; gpuInventory.push(idx); gpuBuyCounts[idx]++; updateUI(); saveData();
-            }
-        }
-
-        function confirmDeleteGPU(inventoryIndex, gpuName) {
-            tg.showConfirm(`Вы точно хотите удалить ${gpuName}? Место освободится, но доход упадет.`, (isConfirmed) => {
-                if (isConfirmed) { gpuInventory.splice(inventoryIndex, 1); updateUI(); saveData(); }
-            });
-        }
-
-        function buyClickUpgrade() {
-            let currentPower = clickPower || 0.5;
-            let price = 15 + (currentPower - 0.5) * 60;
-            if (btc >= price) { btc -= price; clickPower = currentPower + 0.2; updateUI(); saveData(); }
-        }
-
-        function upgradeSlots() {
-            let currentSlots = maxSlots || 5;
-            let price = 50 + (currentSlots - 5) * 125;
-            if (btc >= price && currentSlots < 15) { btc -= price; maxSlots = currentSlots + 1; updateUI(); saveData(); }
-        }
-
-        // Основные циклы
         setInterval(() => {
             btc += calculatePassiveIncome();
-            if (energy < 100) energy = Math.min(100, energy + (100 / 30));
-            
+            if (energy < 100) energy = Math.min(100, energy + 3.33);
             document.getElementById('btc').innerText = btc.toFixed(2);
             document.getElementById('energy-val').innerText = Math.floor(energy);
             document.getElementById('energy-bar').style.width = `${energy}%`;
         }, 1000);
 
-        setInterval(runAutoclicker, 2000);
-        
-        // Фоновое автосохранение раз в 12 секунд (на всякий случай)
-        setInterval(saveData, 12000);
-        
+        setInterval(() => { if (hasAutoclicker === 1 && energy >= 2) { energy -= 2; btc += clickPower; } }, 2000);
+        setInterval(saveData, 15000); // Резервное автосохранение
         loadData();
     </script>
 </body>
