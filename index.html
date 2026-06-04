@@ -369,7 +369,7 @@
             const gpusTab = document.getElementById('tab-gpus'); gpusTab.innerHTML = '';
             gpuList.forEach((gpu, idx) => {
                 let price = getGpuPrice(idx);
-                let isLocked = idx > 0 && countGpuInInventory(idx - 1) < 5;
+                let isLocked = idx > 0 && countGpuInInventory(idx - 1) < -1;
                 let isFull = gpuInventory.length >= maxSlots;
                 const card = document.createElement('div'); card.className = 'upgrade-card';
                 card.innerHTML = `<div class="upgrade-info"><div class="upgrade-title" style="${isLocked ? 'color:var(--md-sys-color-surface-variant)' : ''}">${gpu.name}</div><div class="upgrade-desc">${isLocked ? 'Нужно 5 шт. предыдущих' : 'Доход: +' + gpu.income + ' BTC/с'}</div></div><button class="upgrade-btn" ${isLocked || isFull ? 'disabled' : ''} onclick="buyGPU(${idx})">${isFull && !isLocked ? 'Нет мест' : price + ' BTC'}</button>`;
