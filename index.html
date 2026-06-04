@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Miner</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 20px; }
+        .balance { font-size: 24px; color: #f2a900; margin-bottom: 20px; }
+        .slots-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .slot { background: #333; border: 2px dashed #555; padding: 15px; border-radius: 8px; min-height: 50px; }
+        .slot.active { border-style: solid; border-color: #f2a900; background: #2a2518; }
+        button { background: #f2a900; color: black; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin: 5px; font-weight: bold;}
+        button:disabled { background: #555; color: #888; }
+    </style>
+</head>
+<body>
+
+    <h1>Bitcoin Miner 🪙</h1>
+    <div class="balance">Биткоины: <span id="btc">0</span> BTC</div>
+    <div class="balance" style="font-size: 18px; color: #aaa;">Видеокарты: <span id="gpu-count">0</span> / <span id="max-slots">5</span></div>
+
+    <div class="slots-container" id="slots-grid"></div>
+
+    <button id="buy-gpu-btn" onclick="buyGPU()">Купить GPU (10 BTC)</button>
+    <button id="upgrade-slots-btn" onclick="upgradeSlots()">+1 Слот (50 BTC)</button>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        const userId = tg.initDataUnsafe?.user?.id || 12345; // 12345 — для тестов в обычном браузере
+
+        let btc = 0;
+        let gpuCount = 0;
+        let maxSlots = 5;
+
+        // Загрузка сохранений с сервера
+        async function loadData() {
+            try {
+                let response = await fetch(`/get_user?user_id=${userId}`);
+                let data = await response.json();
+                btc = data.btc;
+                gpuCount = data.gpu_count;
+                maxSlots = data.max_slots;
+                updateUI();
+            } catch (e) {
+                console.error("Ошибка загрузки данных", e);
+            }
+        }
+
+        // Сохранение данных на сервер
+        async function saveData() {
+            await fetch('/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, btc: btc, gpu_count: gpuCount, max_slots: maxSlots })
+            });
+        }
+
+        function updateUI() {
+            document.getElementById('btc').innerText = btc.toFixed(2);
+            document.getElementById('gpu-count').innerText = gpuCount;
+            document.getElementById('max-slots').innerText = maxSlots;
+
+            // Рендерим слоты
+            const grid = document.getElementById('slots-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < maxSlots; i++) {
+                const slot = document.createElement('div');
+                if (i < gpuCount) {
+                    slot.className = 'slot active';
+                    slot.innerText = '📟 GPU';
+                } else {
+                    slot.className = 'slot';
+                    slot.innerText = 'Пусто';
+                }
+                grid.appendChild(slot);
+            }
+
+            // Ограничение на апгрейд слотов (максимум 15)
+            if (maxSlots >= 15) {
+                document.getElementById('upgrade-slots-btn').disabled = true;
+                document.getElementById('upgrade-slots-btn').innerText = "Макс. слотов";
+            }
+        }
+
+        function buyGPU() {
+            if (btc >= 10 && gpuCount < maxSlots) {
+                btc -= 10;
+                gpuCount++;
+                updateUI();
+                saveData();
+            } else if (gpuCount >= maxSlots) {
+                alert("Нет свободных слотов!");
+            } else {
+                alert("Недостаточно Биткоинов!");
+            }
+        }
+
+        function upgradeSlots() {
+            if (btc >= 50 && maxSlots < 15) {
+                btc -= 50;
+                maxSlots++;
+                updateUI();
+                saveData();
+            } else if (maxSlots >= 15) {
+                alert("Достигнут лимит в 15 слотов!");
+            } else {
+                alert("Недостаточно Биткоинов!");
+            }
+        }
+
+        // Каждую секунду видеокарты майнят биткоины (1 видеокарта = 0.1 BTC в сек)
+        setInterval(() => {
+            if (gpuCount > 0) {
+                btc += gpuCount * 0.1;
+                updateUI();
+            }
+        }, 1000);
+
+        // Автосохранение каждые 5 секунд
+        setInterval(saveData, 5000);
+
+        // Старт игры
+        loadData();
+    </script>
+</body>
+</html>
