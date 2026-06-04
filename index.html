@@ -235,7 +235,7 @@
         let clickPower = 0.5;
         let energy = 100;
         let gpuBuyCounts = [0, 0, 0, 0, 0];
-        let hasAutoclicker = 0; // 0 - нет, 1 - куплен
+        let hasAutoclicker = 0;
 
         function switchScreen(screenId, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -254,39 +254,63 @@
 
         async function loadData() {
             try {
-                let response = await fetch(`/get_user?user_id=${userId}`);
+                let currentUserId = parseInt(userId) || 12345;
+                let response = await fetch(`/get_user?user_id=${currentUserId}`);
                 let data = await response.json();
-                btc = data.btc;
-                gpuInventory = data.gpu_inventory ? data.gpu_inventory.split(',').map(Number) : [];
-                if (data.gpu_inventory === '') gpuInventory = [];
                 
-                gpuBuyCounts = data.gpu_buy_counts ? data.gpu_buy_counts.split(',').map(Number) : [0, 0, 0, 0, 0];
-                maxSlots = data.max_slots;
-                clickPower = data.click_power;
-                energy = data.energy;
-                hasAutoclicker = data.has_autoclicker || 0;
-
+                btc = parseFloat(data.btc) || 0;
+                maxSlots = parseInt(data.max_slots) || 5;
+                clickPower = parseFloat(data.click_power) || 0.5;
+                energy = parseFloat(data.energy) || 100;
+                hasAutoclicker = parseInt(data.has_autoclicker) || 0;
+                
+                if (data.gpu_inventory && data.gpu_inventory.trim() !== "") {
+                    gpuInventory = data.gpu_inventory.split(',').map(Number);
+                } else {
+                    gpuInventory = [];
+                }
+                
+                if (data.gpu_buy_counts && data.gpu_buy_counts.trim() !== "") {
+                    gpuBuyCounts = data.gpu_buy_counts.split(',').map(Number);
+                } else {
+                    gpuBuyCounts = [0, 0, 0, 0, 0];
+                }
+                
                 updateUI();
 
-                // Показ нативного окна с офлайн-доходом, если он больше нуля
                 if (data.offline_earnings && data.offline_earnings > 0) {
                     tg.showAlert(`С возвращением!\nПока тебя не было, твоя ферма принесла: ${data.offline_earnings.toFixed(2)} BTC (за ${data.offline_time_text})`);
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error("Ошибка загрузки:", e); 
+            }
         }
 
         async function saveData() {
-            await fetch('/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: userId, btc: btc, 
-                    gpu_inventory: gpuInventory.join(','), 
-                    gpu_buy_counts: gpuBuyCounts.join(','),
-                    max_slots: maxSlots, click_power: clickPower, energy: energy,
-                    has_autoclicker: hasAutoclicker
-                })
-            });
+            try {
+                let currentUserId = parseInt(userId) || 12345;
+                let gpuInventoryStr = gpuInventory.length > 0 ? gpuInventory.join(',') : "";
+                let gpuBuyCountsStr = gpuBuyCounts.length > 0 ? gpuBuyCounts.join(',') : "0,0,0,0,0";
+
+                let payload = {
+                    user_id: currentUserId,
+                    btc: parseFloat(btc), 
+                    gpu_inventory: gpuInventoryStr, 
+                    gpu_buy_counts: gpuBuyCountsStr,
+                    max_slots: parseInt(maxSlots), 
+                    click_power: parseFloat(clickPower), 
+                    energy: parseFloat(energy),
+                    has_autoclicker: parseInt(hasAutoclicker)
+                };
+
+                await fetch('/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) {
+                console.error("Ошибка сохранения:", e);
+            }
         }
 
         function calculatePassiveIncome() {
@@ -294,7 +318,8 @@
         }
 
         function getGpuPrice(idx) {
-            return Math.round(gpuList[idx].basePrice * Math.pow(1.15, gpuBuyCounts[idx]));
+            let counts = (gpuBuyCounts && gpuBuyCounts[idx] !== undefined) ? gpuBuyCounts[idx] : 0;
+            return Math.round(gpuList[idx].basePrice * Math.pow(1.15, counts));
         }
 
         function countGpuInInventory(idx) {
@@ -304,14 +329,17 @@
         function updateUI() {
             let passiveIncome = calculatePassiveIncome();
             document.getElementById('btc').innerText = btc.toFixed(2);
-            document.getElementById('info-tap').innerText = `+${clickPower.toFixed(1)}`;
+            
+            let currentPower = clickPower || 0.5;
+            document.getElementById('info-tap').innerText = `+${currentPower.toFixed(1)}`;
             document.getElementById('info-pps').innerText = passiveIncome.toFixed(1);
 
-            // Рендер фермы
-            document.getElementById('farm-slots').innerText = `${gpuInventory.length}/${maxSlots}`;
+            let currentSlots = maxSlots || 5;
+            document.getElementById('farm-slots').innerText = `${gpuInventory.length}/${currentSlots}`;
+            
             const grid = document.getElementById('slots-grid');
             grid.innerHTML = '';
-            for(let i = 0; i < maxSlots; i++) {
+            for(let i = 0; i < currentSlots; i++) {
                 const card = document.createElement('div');
                 if (i < gpuInventory.length) {
                     let gpuIdx = gpuInventory[i];
@@ -335,14 +363,13 @@
                 grid.appendChild(card);
             }
 
-            // Магазин карт
             const gpusTab = document.getElementById('tab-gpus');
             gpusTab.innerHTML = '';
             gpuList.forEach((gpu, idx) => {
                 let price = getGpuPrice(idx);
                 let isLocked = idx > 0 && countGpuInInventory(idx - 1) < 5;
                 let lockReason = `Нужно 5 шт. ${gpuList[idx-1]?.name} (Есть: ${countGpuInInventory(idx - 1)})`;
-                let isFull = gpuInventory.length >= maxSlots;
+                let isFull = gpuInventory.length >= currentSlots;
 
                 const card = document.createElement('div');
                 card.className = 'upgrade-card';
@@ -356,8 +383,7 @@
                 gpusTab.appendChild(card);
             });
 
-            // Апгрейды клика и сисадмина
-            let clickPrice = 15 + (clickPower - 0.5) * 60;
+            let clickPrice = 15 + (currentPower - 0.5) * 60;
             document.getElementById('btn-buy-click').innerText = `${clickPrice.toFixed(0)} BTC`;
 
             let acBtn = document.getElementById('btn-buy-autoclicker');
@@ -371,14 +397,15 @@
                 acBtn.innerText = "250 BTC";
             }
 
-            let slotsPrice = 50 + (maxSlots - 5) * 125;
+            let slotsPrice = 50 + (currentSlots - 5) * 125;
             document.getElementById('btn-upgrade-slots').innerText = `${slotsPrice} BTC`;
-            document.getElementById('btn-upgrade-slots').disabled = maxSlots >= 15;
+            document.getElementById('btn-upgrade-slots').disabled = currentSlots >= 15;
         }
 
         function handleClick(e) {
             if (energy >= 2) {
-                energy -= 2; btc += clickPower;
+                energy -= 2; 
+                btc += (clickPower || 0.5);
                 document.getElementById('energy-val').innerText = Math.ceil(energy);
                 document.getElementById('energy-bar').style.width = `${energy}%`;
                 document.getElementById('btc').innerText = btc.toFixed(2);
@@ -386,11 +413,10 @@
             }
         }
 
-        // Логика автокликера (вызывается раз в 2 секунды)
         function runAutoclicker() {
             if (hasAutoclicker === 1 && energy >= 2) {
                 energy -= 2;
-                btc += clickPower;
+                btc += (clickPower || 0.5);
                 document.getElementById('energy-val').innerText = Math.ceil(energy);
                 document.getElementById('energy-bar').style.width = `${energy}%`;
                 document.getElementById('btc').innerText = btc.toFixed(2);
@@ -417,16 +443,18 @@
         }
 
         function buyClickUpgrade() {
-            let price = 15 + (clickPower - 0.5) * 60;
-            if (btc >= price) { btc -= price; clickPower += 0.2; updateUI(); saveData(); }
+            let currentPower = clickPower || 0.5;
+            let price = 15 + (currentPower - 0.5) * 60;
+            if (btc >= price) { btc -= price; clickPower = currentPower + 0.2; updateUI(); saveData(); }
         }
 
         function upgradeSlots() {
-            let price = 50 + (maxSlots - 5) * 125;
-            if (btc >= price && maxSlots < 15) { btc -= price; maxSlots++; updateUI(); saveData(); }
+            let currentSlots = maxSlots || 5;
+            let price = 50 + (currentSlots - 5) * 125;
+            if (btc >= price && currentSlots < 15) { btc -= price; maxSlots = currentSlots + 1; updateUI(); saveData(); }
         }
 
-        // Игровой цикл
+        // Таймеры
         setInterval(() => {
             btc += calculatePassiveIncome();
             if (energy < 100) energy = Math.min(100, energy + (100 / 30));
@@ -436,9 +464,7 @@
             document.getElementById('energy-bar').style.width = `${energy}%`;
         }, 1000);
 
-        // Цикл автокликера (каждые 2 секунды)
         setInterval(runAutoclicker, 2000);
-
         setInterval(saveData, 8000);
         loadData();
     </script>
