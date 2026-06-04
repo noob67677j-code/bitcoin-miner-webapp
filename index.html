@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitcoin Miner Tycoon Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght=400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <style>
         :root {
             --md-sys-color-background: #141218;
@@ -43,7 +43,7 @@
         .stat-chip .label { color: var(--md-sys-color-on-surface-variant); }
         .stat-chip .val { font-weight: 500; color: #fff; }
 
-        .main-content { flex: 1; overflow-y: auto; padding: 10px 20px 210px 20px; }
+        .main-content { flex: 1; overflow-y: auto; padding: 10px 20px 110px 20px; }
         .screen { display: none; animation: fadeIn 0.25s ease; }
         .screen.active { display: block; }
 
@@ -127,7 +127,7 @@
         .chance-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: var(--md-sys-color-on-surface-variant); }
         .chance-row span.name { color: #fff; }
 
-        /* НАВИГАЦИЯ И КНОПКА ВЫХОДА */
+        /* НАВИГАЦИЯ */
         .controls-panel {
             position: fixed; bottom: 0; left: 0; right: 0;
             background-color: var(--md-sys-color-surface); display: flex; flex-direction: column;
@@ -140,12 +140,6 @@
         .nav-item.active { color: var(--md-sys-color-on-surface); font-weight: 500; }
         .nav-item span.material-symbols-rounded { font-size: 22px; }
         .nav-label { font-size: 10px; }
-
-        .exit-save-wrapper { padding: 6px 16px 10px 16px; background-color: var(--md-sys-color-surface); border-top: 1px solid rgba(255,255,255,0.02); }
-        .exit-save-btn {
-            width: 100%; background: var(--md-sys-color-error); color: #141218; border: none; padding: 11px; border-radius: 12px; font-weight: 700;
-            font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 180, 171, 0.15);
-        }
     </style>
 </head>
 <body>
@@ -227,21 +221,36 @@
             <div class="nav-item" onclick="switchScreen('upgrades', this)"><div class="nav-icon-wrapper"><span class="material-symbols-rounded">upgrade</span></div><div class="nav-label">Прокачка</div></div>
             <div class="nav-item" onclick="switchScreen('cases', this)"><div class="nav-icon-wrapper"><span class="material-symbols-rounded">card_membership</span></div><div class="nav-label">Кейсы</div></div>
         </nav>
-        <div class="exit-save-wrapper">
-            <button class="exit-save-btn" onclick="exitAndSaveGame()"><span class="material-symbols-rounded" style="font-size: 16px">logout</span> Выйти и сохранить прогресс</button>
-        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
 
-        // Авто-настройка URL бэкенда
-        const serverUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') 
-            ? 'http://127.0.0.1:5000' 
-            : window.location.origin;
+        // Настройка главной кнопки Telegram (MainButton)
+        tg.MainButton.setText("💾 СОХРАНИТЬ И ВЫЙТИ");
+        tg.MainButton.setTextColor("#141218");
+        tg.MainButton.setBackgroundColor("#ffb4ab"); // Цвет var(--md-sys-color-error)
+        tg.MainButton.show();
 
-        const userId = tg.initDataUnsafe?.user?.id || 12345;
+        // Клик по кнопке ТГ вызывает отправку данных боту
+        tg.MainButton.onClick(function() {
+            if (isRolling) return;
+            
+            // Собираем весь игровой прогресс в один компактный объект
+            let savePayload = {
+                btc: parseFloat(btc),
+                gpu_inventory: gpuInventory.join(','),
+                gpu_buy_counts: gpuBuyCounts.join(','),
+                max_slots: parseInt(maxSlots),
+                click_power: parseFloat(clickPower),
+                energy: parseFloat(energy),
+                has_autoclicker: parseInt(hasAutoclicker)
+            };
+            
+            // Отправляем данные напрямую боту и закрываем окно!
+            tg.sendData(JSON.stringify(savePayload));
+        });
 
         const gpuList = [
             { name: "GTX 1660", income: 0.1, basePrice: 10, icon: "hardware" },
@@ -252,6 +261,36 @@
         ];
 
         let btc = 0; let gpuInventory = []; let maxSlots = 5; let clickPower = 0.5; let energy = 100; let gpuBuyCounts = [0, 0, 0, 0, 0]; let hasAutoclicker = 0; let isRolling = false;
+
+        // ПОЛУЧЕНИЕ ДАННЫХ ИЗ ССЫЛКИ СТАРТА (Переданных ботом)
+        function parseInitData() {
+            try {
+                // Ищем параметры, которые бот передал в URL игры
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('btc')) btc = parseFloat(urlParams.get('btc'));
+                if (urlParams.has('max_slots')) maxSlots = parseInt(urlParams.get('max_slots'));
+                if (urlParams.has('click_power')) clickPower = parseFloat(urlParams.get('click_power'));
+                if (urlParams.has('energy')) energy = parseFloat(urlParams.get('energy'));
+                if (urlParams.has('has_autoclicker')) hasAutoclicker = parseInt(urlParams.get('has_autoclicker'));
+                
+                let invRaw = urlParams.get('gpu_inventory');
+                gpuInventory = invRaw ? invRaw.split('.').map(Number) : [];
+                
+                let buyRaw = urlParams.get('gpu_buy_counts');
+                gpuBuyCounts = buyRaw ? buyRaw.split('.').map(Number) : [0,0,0,0,0];
+                
+                // Проверка офлайн дохода
+                let offlineEarnings = parseFloat(urlParams.get('offline_earnings')) || 0;
+                let offlineText = urlParams.get('offline_time') || "";
+                if (offlineEarnings > 0) {
+                    btc += offlineEarnings;
+                    setTimeout(() => {
+                        tg.showAlert(`С возвращением!\nФерма намайнила: ${offlineEarnings.toFixed(2)} BTC за ${decodeURIComponent(offlineText)}`);
+                    }, 500);
+                }
+            } catch(e) { console.error("Ошибка парсинга даты:", e); }
+            updateUI();
+        }
 
         function switchScreen(screenId, el) {
             if (isRolling) return;
@@ -270,49 +309,6 @@
             document.getElementById('tab-slots').style.display = tabName === 'slots' ? 'flex' : 'none';
         }
 
-        async function loadData() {
-            try {
-                let res = await fetch(`${serverUrl}/get_user?user_id=${userId}`);
-                let data = await res.json();
-                btc = parseFloat(data.btc) || 0;
-                maxSlots = parseInt(data.max_slots) || 5;
-                clickPower = parseFloat(data.click_power) || 0.5;
-                energy = parseFloat(data.energy) || 100;
-                hasAutoclicker = parseInt(data.has_autoclicker) || 0;
-                gpuInventory = data.gpu_inventory ? data.gpu_inventory.split(',').map(Number) : [];
-                gpuBuyCounts = data.gpu_buy_counts ? data.gpu_buy_counts.split(',').map(Number) : [0,0,0,0,0];
-                updateUI();
-                if (data.offline_earnings && data.offline_earnings > 0) {
-                    tg.showAlert(`С возвращением!\nФерма намайнила: ${data.offline_earnings.toFixed(2)} BTC за ${data.offline_time_text}`);
-                }
-            } catch (e) { console.error("Ошибка загрузки:", e); }
-        }
-
-        function saveData() {
-            return new Promise(async (resolve) => {
-                try {
-                    let payload = {
-                        user_id: userId, btc: parseFloat(btc), gpu_inventory: gpuInventory.join(','),
-                        gpu_buy_counts: gpuBuyCounts.join(','), max_slots: parseInt(maxSlots),
-                        click_power: parseFloat(clickPower), energy: parseFloat(energy), has_autoclicker: parseInt(hasAutoclicker)
-                    };
-                    let res = await fetch(`${serverUrl}/save`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                    });
-                    resolve(res.ok);
-                } catch (e) { resolve(false); }
-            });
-        }
-
-        async function exitAndSaveGame() {
-            if (isRolling) return;
-            const btn = document.querySelector('.exit-save-btn');
-            btn.disabled = true; btn.style.backgroundColor = '#49454f'; btn.innerHTML = 'Сохранение...';
-            let success = await saveData();
-            if (success) tg.close();
-            else { btn.disabled = false; btn.style.backgroundColor = 'var(--md-sys-color-error)'; btn.innerHTML = 'Ошибка! Повторить'; }
-        }
-
         function buildRouletteTape(winningGpuIdx = null) {
             const track = document.getElementById('roulette-track');
             track.style.transition = 'none'; track.style.transform = 'translateX(0px)'; track.innerHTML = '';
@@ -327,7 +323,7 @@
             }
         }
 
-        async function openGpuCase() {
+        function openGpuCase() {
             if (isRolling) return;
             if (btc < 45) { tg.showAlert("Недостаточно средств (Нужно 45 BTC)"); return; }
             if (gpuInventory.length >= maxSlots) { tg.showAlert("Нет свободных слотов!"); return; }
@@ -335,47 +331,36 @@
             isRolling = true; 
             document.getElementById('btn-open-case').disabled = true;
             
-            try {
-                let res = await fetch(`${serverUrl}/open_case`, {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ user_id: userId })
-                });
-                let data = await res.json();
-                
-                if (data.status === 'success') {
-                    btc = data.current_btc; 
-                    gpuInventory = data.current_inventory.split(',').map(Number);
-                    let winningIdx = data.won_gpu_idx;
-                    
-                    buildRouletteTape(winningIdx);
-                    
-                    const itemWidth = 98; 
-                    const wrapperCenter = 160; 
-                    const stopPosition = -((28 * itemWidth) - wrapperCenter + (itemWidth / 2));
-                    const track = document.getElementById('roulette-track');
-                    
-                    setTimeout(() => {
-                        track.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.6, 0.1, 1)';
-                        track.style.transform = `translateX(${stopPosition}px)`;
-                    }, 50);
-                    
-                    setTimeout(() => {
-                        if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                        tg.showAlert(`🎉 Выпало устройство: ${gpuList[winningIdx].name}!`);
-                        isRolling = false; 
-                        document.getElementById('btn-open-case').disabled = false; 
-                        updateUI();
-                    }, 3700);
-                } else { 
-                    tg.showAlert(data.message); 
-                    isRolling = false; 
-                    document.getElementById('btn-open-case').disabled = false; 
-                }
-            } catch (e) { 
+            let rand = Math.floor(Math.random() * 100) + 1;
+            let winningIdx = 0;
+            if (rand <= 55) winningIdx = 0;
+            else if (rand <= 55 + 27) winningIdx = 1;
+            else if (rand <= 55 + 27 + 12) winningIdx = 2;
+            else if (rand <= 55 + 27 + 12 + 5) winningIdx = 3;
+            else winningIdx = 4;
+            
+            btc -= 45;
+            gpuInventory.push(winningIdx);
+            
+            buildRouletteTape(winningIdx);
+            
+            const itemWidth = 98; 
+            const wrapperCenter = 160; 
+            const stopPosition = -((28 * itemWidth) - wrapperCenter + (itemWidth / 2));
+            const track = document.getElementById('roulette-track');
+            
+            setTimeout(() => {
+                track.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.6, 0.1, 1)';
+                track.style.transform = `translateX(${stopPosition}px)`;
+            }, 50);
+            
+            setTimeout(() => {
+                if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                tg.showAlert(`🎉 Выпало устройство: ${gpuList[winningIdx].name}!`);
                 isRolling = false; 
                 document.getElementById('btn-open-case').disabled = false; 
-            }
+                updateUI();
+            }, 3700);
         }
 
         function calculatePassiveIncome() { return gpuInventory.reduce((sum, idx) => sum + gpuList[idx].income, 0); }
@@ -430,11 +415,11 @@
             }
         }
 
-        function buyAutoclicker() { if (btc >= 250 && hasAutoclicker === 0) { btc -= 250; hasAutoclicker = 1; updateUI(); saveData(); } }
-        function buyGPU(idx) { let price = getGpuPrice(idx); if (btc >= price && gpuInventory.length < maxSlots) { btc -= price; gpuInventory.push(idx); gpuBuyCounts[idx]++; updateUI(); saveData(); } }
-        function confirmDeleteGPU(inventoryIndex, gpuName) { tg.showConfirm(`Удалить ${gpuName}?`, (ok) => { if (ok) { gpuInventory.splice(inventoryIndex, 1); updateUI(); saveData(); } }); }
-        function buyClickUpgrade() { let p = 15 + (clickPower - 0.5) * 60; if (btc >= p) { btc -= p; clickPower += 0.2; updateUI(); saveData(); } }
-        function upgradeSlots() { let p = 50 + (maxSlots - 5) * 125; if (btc >= p && maxSlots < 15) { btc -= p; maxSlots++; updateUI(); updateUI(); saveData(); } }
+        function buyAutoclicker() { if (btc >= 250 && hasAutoclicker === 0) { btc -= 250; hasAutoclicker = 1; updateUI(); } }
+        function buyGPU(idx) { let price = getGpuPrice(idx); if (btc >= price && gpuInventory.length < maxSlots) { btc -= price; gpuInventory.push(idx); gpuBuyCounts[idx]++; updateUI(); } }
+        function confirmDeleteGPU(inventoryIndex, gpuName) { tg.showConfirm(`Удалить ${gpuName}?`, (ok) => { if (ok) { gpuInventory.splice(inventoryIndex, 1); updateUI(); } }); }
+        function buyClickUpgrade() { let p = 15 + (clickPower - 0.5) * 60; if (btc >= p) { btc -= p; clickPower += 0.2; updateUI(); } }
+        function upgradeSlots() { let p = 50 + (maxSlots - 5) * 125; if (btc >= p && maxSlots < 15) { btc -= p; maxSlots++; updateUI(); } }
 
         setInterval(() => {
             btc += calculatePassiveIncome();
@@ -445,8 +430,9 @@
         }, 1000);
 
         setInterval(() => { if (hasAutoclicker === 1 && energy >= 2) { energy -= 2; btc += clickPower; } }, 2000);
-        setInterval(saveData, 15000); 
-        loadData();
+        
+        // Старт инициализации параметров
+        parseInitData();
     </script>
 </body>
 </html>
