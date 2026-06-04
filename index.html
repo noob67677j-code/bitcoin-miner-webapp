@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Miner Pro</title>
+    <title>Bitcoin Miner Tycoon</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <style>
@@ -19,6 +19,7 @@
             --md-sys-color-primary-container: #4f378b;
             --md-sys-color-secondary-container: #4a4458;
             --md-sys-color-on-secondary-container: #e8def8;
+            --md-sys-color-error: #ffb4ab;
             --color-btc: #f2a900;
         }
 
@@ -27,25 +28,14 @@
             font-family: 'Roboto', sans-serif;
             background-color: var(--md-sys-color-background);
             color: var(--md-sys-color-on-background);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
-        /* Шапка с балансом и статистикой */
-        header {
-            padding: 20px 20px 10px 20px;
-            text-align: center;
-            background: linear-gradient(180deg, rgba(33,31,38,1) 0%, rgba(20,18,24,0) 100%);
-        }
+        header { padding: 20px 20px 10px 20px; text-align: center; background: linear-gradient(180deg, rgba(33,31,38,1) 0%, rgba(20,18,24,0) 100%); }
         .balance-title { font-size: 13px; color: var(--md-sys-color-on-surface-variant); letter-spacing: 1px; text-transform: uppercase; }
         .balance-value { font-size: 34px; font-weight: 700; color: var(--color-btc); margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         
-        /* Панель показателей под балансом */
-        .stats-strip {
-            display: flex; gap: 10px; margin-top: 15px; justify-content: center;
-        }
+        .stats-strip { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
         .stat-chip {
             background: var(--md-sys-color-surface); padding: 8px 14px; border-radius: 12px;
             font-size: 12px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.03);
@@ -53,31 +43,28 @@
         .stat-chip .label { color: var(--md-sys-color-on-surface-variant); }
         .stat-chip .val { font-weight: 500; color: #fff; }
 
-        /* Контейнер для экранов */
         .main-content { flex: 1; overflow-y: auto; padding: 10px 20px 100px 20px; }
         .screen { display: none; animation: fadeIn 0.25s ease; }
         .screen.active { display: block; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ЭКРАН: КЛИКЕР */
+        /* КЛИКЕР */
         #screen-clicker { text-align: center; padding-top: 30px; }
         .click-btn {
             width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle, #f5b942 0%, #f2a900 100%);
             box-shadow: 0 12px 35px rgba(242, 169, 0, 0.25), inset 0 -8px 15px rgba(0,0,0,0.2);
             border: 6px solid var(--md-sys-color-surface); margin: 0 auto 35px auto;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: transform 0.05s ease;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.05s ease;
         }
         .click-btn:active { transform: scale(0.94); }
         .click-btn span { font-size: 85px; color: #141218; }
         
-        /* Энергия */
         .energy-container { width: 100%; max-width: 280px; margin: 0 auto; background: var(--md-sys-color-surface-variant); height: 10px; border-radius: 5px; overflow: hidden; }
         .energy-bar { height: 100%; background: var(--md-sys-color-primary); width: 100%; transition: width 0.1s linear; }
         .energy-text { font-size: 13px; margin-top: 8px; color: var(--md-sys-color-on-surface-variant); display: flex; align-items: center; justify-content: center; gap: 4px; }
 
-        /* ЭКРАН: ФЕРМА */
+        /* ФЕРМА */
         .farm-header { background: var(--md-sys-color-surface); padding: 15px; border-radius: 16px; margin-bottom: 15px; font-size: 14px; text-align: center; color: var(--md-sys-color-on-surface-variant); }
         .slots-grid { display: flex; flex-direction: column; gap: 10px; }
         .slot-card {
@@ -90,10 +77,17 @@
         .slot-card .gpu-meta { flex: 1; }
         .slot-card .gpu-name { font-weight: 500; font-size: 15px; }
         .slot-card .gpu-profit { font-size: 12px; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
+        
+        /* Кнопка удаления (Трэш-иконка) */
+        .delete-btn {
+            background: none; border: none; color: var(--md-sys-color-error); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 50%;
+        }
+        .delete-btn:active { background: rgba(255, 180, 171, 0.1); }
 
-        /* ЭКРАН: ПРОКАЧКА */
-        .sub-nav { display: flex; background: var(--md-sys-color-surface); padding: 4px; border-radius: 12px; margin-bottom: 15px; }
-        .sub-nav-btn { flex: 1; background: none; border: none; padding: 10px; color: var(--md-sys-color-on-surface-variant); border-radius: 9px; cursor: pointer; font-weight: 500; font-size: 14px; }
+        /* ПРОКАЧКА (3 Таба) */
+        .sub-nav { display: flex; background: var(--md-sys-color-surface); padding: 4px; border-radius: 12px; margin-bottom: 15px; gap: 2px; }
+        .sub-nav-btn { flex: 1; background: none; border: none; padding: 10px 5px; color: var(--md-sys-color-on-surface-variant); border-radius: 9px; cursor: pointer; font-weight: 500; font-size: 13px; }
         .sub-nav-btn.active { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-secondary-container); }
         
         .upgrade-list { display: flex; flex-direction: column; gap: 10px; }
@@ -103,13 +97,13 @@
             border: 1px solid var(--md-sys-color-surface-variant);
         }
         .upgrade-info { display: flex; flex-direction: column; gap: 3px; max-width: 65%; }
-        .upgrade-title { font-weight: 500; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .upgrade-title { font-weight: 500; font-size: 15px; }
         .upgrade-desc { font-size: 12px; color: var(--md-sys-color-on-surface-variant); }
         .upgrade-btn {
             background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
             border: none; padding: 10px 14px; border-radius: 20px; font-weight: 500; font-size: 13px; cursor: pointer; white-space: nowrap;
         }
-        .upgrade-btn:disabled { background: var(--md-sys-color-surface-variant); color: #888; cursor: not-allowed; }
+        .upgrade-btn:disabled { background: var(--md-sys-color-surface-variant); color: #777; cursor: not-allowed; }
 
         /* НАВИГАЦИЯ */
         nav.bottom-bar {
@@ -171,18 +165,15 @@
 
         <div id="screen-upgrades" class="screen">
             <div class="sub-nav">
-                <button class="sub-nav-btn active" onclick="switchSubTab('income')">Заработок</button>
-                <button class="sub-nav-btn" onclick="switchSubTab('slots')">Слоты</button>
+                <button class="sub-nav-btn active" id="sub-btn-gpus" onclick="switchSubTab('gpus')">Видеокарты</button>
+                <button class="sub-nav-btn" id="sub-btn-income" onclick="switchSubTab('income')">Заработок</button>
+                <button class="sub-nav-btn" id="sub-btn-slots" onclick="switchSubTab('slots')">Слоты</button>
             </div>
 
-            <div id="tab-income" class="upgrade-list">
-                <div class="upgrade-card">
-                    <div class="upgrade-info">
-                        <div class="upgrade-title" id="gpu-next-name">Купить GTX 1660</div>
-                        <div class="upgrade-desc" id="gpu-next-desc">Доход: +0.1 BTC/сек</div>
-                    </div>
-                    <button class="upgrade-btn" id="btn-buy-gpu" onclick="buyGPU()">10 BTC</button>
+            <div id="tab-gpus" class="upgrade-list">
                 </div>
+
+            <div id="tab-income" class="upgrade-list" style="display: none;">
                 <div class="upgrade-card">
                     <div class="upgrade-info">
                         <div class="upgrade-title">Улучшить Тап</div>
@@ -225,21 +216,24 @@
 
         const userId = tg.initDataUnsafe?.user?.id || 12345;
 
-        // База доступных видеокарт (по порядку покупки)
+        // Базовые параметры видеокарт
         const gpuList = [
-            { name: "GTX 1660", income: 0.1, price: 10, icon: "hardware" },
-            { name: "RTX 3060", income: 0.4, price: 45, icon: "memory" },
-            { name: "RTX 4060", income: 1.2, price: 120, icon: "developer_board" },
-            { name: "RTX 4090", income: 3.5, price: 380, icon: "blender" },
-            { name: "Antminer S19", income: 10.0, price: 1100, icon: "router" }
+            { name: "GTX 1660", income: 0.1, basePrice: 10, icon: "hardware" },
+            { name: "RTX 3060", income: 0.4, basePrice: 45, icon: "memory" },
+            { name: "RTX 4060", income: 1.2, basePrice: 120, icon: "developer_board" },
+            { name: "RTX 4090", income: 3.5, basePrice: 380, icon: "blender" },
+            { name: "Antminer S19", income: 10.0, basePrice: 1100, icon: "router" }
         ];
 
-        // Состояние
+        // Игровые данные
         let btc = 0;
-        let gpuInventory = []; // Массив индексов купленных видеокарт, например [0, 0, 1]
+        let gpuInventory = []; 
         let maxSlots = 5;
         let clickPower = 0.5;
         let energy = 100;
+        
+        // Массив, хранящий сколько РАЗ каждая видеокарта была куплена за ВСЁ время (нужно для динамической цены)
+        let gpuBuyCounts = [0, 0, 0, 0, 0];
 
         function switchScreen(screenId, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -250,14 +244,11 @@
 
         function switchSubTab(tabName) {
             document.querySelectorAll('.sub-nav-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            if(tabName === 'income') {
-                document.getElementById('tab-income').style.display = 'flex';
-                document.getElementById('tab-slots').style.display = 'none';
-            } else {
-                document.getElementById('tab-income').style.display = 'none';
-                document.getElementById('tab-slots').style.display = 'flex';
-            }
+            document.getElementById(`sub-btn-${tabName}`).classList.add('active');
+            
+            document.getElementById('tab-gpus').style.display = tabName === 'gpus' ? 'flex' : 'none';
+            document.getElementById('tab-income').style.display = tabName === 'income' ? 'flex' : 'none';
+            document.getElementById('tab-slots').style.display = tabName === 'slots' ? 'flex' : 'none';
         }
 
         async function loadData() {
@@ -265,8 +256,10 @@
                 let response = await fetch(`/get_user?user_id=${userId}`);
                 let data = await response.json();
                 btc = data.btc;
-                // Парсим инвентарь (строка превращается в массив чисел)
                 gpuInventory = data.gpu_inventory ? data.gpu_inventory.split(',').map(Number) : [];
+                if (data.gpu_inventory === '') gpuInventory = [];
+                
+                gpuBuyCounts = data.gpu_buy_counts ? data.gpu_buy_counts.split(',').map(Number) : [0, 0, 0, 0, 0];
                 maxSlots = data.max_slots;
                 clickPower = data.click_power;
                 energy = data.energy;
@@ -281,6 +274,7 @@
                 body: JSON.stringify({
                     user_id: userId, btc: btc, 
                     gpu_inventory: gpuInventory.join(','), 
+                    gpu_buy_counts: gpuBuyCounts.join(','),
                     max_slots: maxSlots, click_power: clickPower, energy: energy
                 })
             });
@@ -290,26 +284,32 @@
             return gpuInventory.reduce((sum, idx) => sum + gpuList[idx].income, 0);
         }
 
+        // Подсчёт цены видеокарты с увеличением на 15% за каждую прошлую покупку
+        function getGpuPrice(idx) {
+            return Math.round(gpuList[idx].basePrice * Math.pow(1.15, gpuBuyCounts[idx]));
+        }
+
+        // Подсчет сколько штук конкретной карты СЕЙЧАС установлено на ферме
+        function countGpuInInventory(idx) {
+            return gpuInventory.filter(id => id === idx).length;
+        }
+
         function updateUI() {
             let passiveIncome = calculatePassiveIncome();
-            
-            // Основной баланс
             document.getElementById('btc').innerText = btc.toFixed(2);
-            
-            // Новая инфо-панель под балансом
             document.getElementById('info-tap').innerText = `+${clickPower.toFixed(1)}`;
             document.getElementById('info-pps').innerText = passiveIncome.toFixed(1);
 
-            // Экран Фермы
+            // 1. ЭКРАН ФЕРМЫ
             document.getElementById('farm-slots').innerText = `${gpuInventory.length}/${maxSlots}`;
-            
-            // Рендер слотов фермы
             const grid = document.getElementById('slots-grid');
             grid.innerHTML = '';
+            
             for(let i = 0; i < maxSlots; i++) {
                 const card = document.createElement('div');
                 if (i < gpuInventory.length) {
-                    let gpu = gpuList[gpuInventory[i]];
+                    let gpuIdx = gpuInventory[i];
+                    let gpu = gpuList[gpuIdx];
                     card.className = 'slot-card active';
                     card.innerHTML = `
                         <span class="material-symbols-rounded gpu-icon">${gpu.icon}</span>
@@ -317,6 +317,9 @@
                             <div class="gpu-name">${gpu.name}</div>
                             <div class="gpu-profit">+${gpu.income} BTC/сек</div>
                         </div>
+                        <button class="delete-btn" onclick="confirmDeleteGPU(${i}, '${gpu.name}')">
+                            <span class="material-symbols-rounded">delete</span>
+                        </button>
                     `;
                 } else {
                     card.className = 'slot-card';
@@ -324,53 +327,64 @@
                         <span class="material-symbols-rounded gpu-icon">grid_view</span>
                         <div class="gpu-meta">
                             <div class="gpu-name" style="color:var(--md-sys-color-surface-variant)">Пустой слот</div>
-                            <div class="gpu-profit">Доступно для установки</div>
+                            <div class="gpu-profit">Свободно</div>
                         </div>
                     `;
                 }
                 grid.appendChild(card);
             }
 
-            // Экран Прокачки: Управление покупкой видеокарт
-            // Определяем, какую карту предложить купить следующей. 
-            // Пусть игрок может покупать любую карту, но для баланса сделаем так: текущая доступная карта зависит от размера фермы или открывается по цепочке. 
-            // Сделаем проще: доступна карта, индекс которой равен (кол-во карт % длину списка), или просто даем цикличный выбор.
-            let nextGpuIdx = Math.min(gpuInventory.length, gpuList.length - 1); 
-            // Если инвентарь полон, показываем последнюю самую мощную карту
-            if(gpuInventory.length >= maxSlots) {
-                nextGpuIdx = gpuList.length - 1;
-            }
-            let nextGpu = gpuList[nextGpuIdx];
+            // 2. ВКЛАДКА ПРОКАЧКИ (МАГАЗИН ВИДЕОКАРТ)
+            const gpusTab = document.getElementById('tab-gpus');
+            gpusTab.innerHTML = '';
 
-            document.getElementById('gpu-next-name').innerText = `Купить ${nextGpu.name}`;
-            document.getElementById('gpu-next-desc').innerText = `Пассивный доход: +${nextGpu.income} BTC/сек`;
-            document.getElementById('btn-buy-gpu').innerText = `${nextGpu.price} BTC`;
-            
-            if(gpuInventory.length >= maxSlots) {
-                document.getElementById('btn-buy-gpu').disabled = true;
-                document.getElementById('gpu-next-name').innerText = `Нет мест на ферме`;
-            } else {
-                document.getElementById('btn-buy-gpu').disabled = false;
-            }
+            gpuList.forEach((gpu, idx) => {
+                let price = getGpuPrice(idx);
+                let isLocked = false;
+                let lockReason = "";
 
-            // Апгрейд тапа
+                // Проверка условия открытия (нужно иметь 5 карт предыдущего уровня на ферме)
+                if (idx > 0) {
+                    let prevGpuCount = countGpuInInventory(idx - 1);
+                    if (prevGpuCount < 5) {
+                        isLocked = true;
+                        lockReason = `Нужно 5 шт. ${gpuList[idx-1].name} на ферме (У вас: ${prevGpuCount})`;
+                    }
+                }
+
+                // Проверка наличия свободных слотов
+                let isFull = gpuInventory.length >= maxSlots;
+
+                const card = document.createElement('div');
+                card.className = 'upgrade-card';
+                card.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-title" style="${isLocked ? 'color:var(--md-sys-color-surface-variant)' : ''}">${gpu.name}</div>
+                        <div class="upgrade-desc">${isLocked ? lockReason : 'Доход: +' + gpu.income + ' BTC/сек'}</div>
+                    </div>
+                    <button class="upgrade-btn" ${isLocked || isFull ? 'disabled' : ''} onclick="buyGPU(${idx})">
+                        ${isFull && !isLocked ? 'Нет мест' : price + ' BTC'}
+                    </button>
+                `;
+                gpusTab.appendChild(card);
+            });
+
+            // Прокачка тапа и слотов
             let clickPrice = 15 + (clickPower - 0.5) * 60;
             document.getElementById('btn-buy-click').innerText = `${clickPrice.toFixed(0)} BTC`;
 
-            // Апгрейд слотов
             let slotsPrice = 50 + (maxSlots - 5) * 125;
             document.getElementById('btn-upgrade-slots').innerText = `${slotsPrice} BTC`;
             document.getElementById('btn-upgrade-slots').disabled = maxSlots >= 15;
             if(maxSlots >= 15) document.getElementById('btn-upgrade-slots').innerText = "Максимум";
         }
 
-        // Клик (Исправленная энергия)
+        // Клик по главной кнопке (теперь снимает 2 единицы)
         function handleClick(e) {
-            if (energy >= 5) { // Теперь за тап снимается 5 единиц энергии
-                energy -= 5;
+            if (energy >= 2) {
+                energy -= 2;
                 btc += clickPower;
                 
-                // Обновляем визуальную часть мгновенно
                 document.getElementById('energy-val').innerText = Math.ceil(energy);
                 document.getElementById('energy-bar').style.width = `${energy}%`;
                 document.getElementById('btc').innerText = btc.toFixed(2);
@@ -381,16 +395,28 @@
             }
         }
 
-        function buyGPU() {
-            let nextGpuIdx = Math.min(gpuInventory.length, gpuList.length - 1);
-            let nextGpu = gpuList[nextGpuIdx];
-            
-            if (btc >= nextGpu.price && gpuInventory.length < maxSlots) {
-                btc -= nextGpu.price;
-                gpuInventory.push(nextGpuIdx);
+        function buyGPU(idx) {
+            let price = getGpuPrice(idx);
+            if (btc >= price && gpuInventory.length < maxSlots) {
+                btc -= price;
+                gpuInventory.push(idx);
+                gpuBuyCounts[idx]++; // Увеличиваем счетчик покупок для инфляции цен
                 updateUI();
                 saveData();
             }
+        }
+
+        // Окно подтверждения удаления видеокарты через Telegram API
+        function confirmDeleteGPU(inventoryIndex, gpuName) {
+            tg.showConfirm(`Вы точно хотите удалить ${gpuName} с вашей фермы? Место освободится, но доход уменьшится.`, (isConfirmed) => {
+                if (isConfirmed) {
+                    // Удаляем карту из массива по её индексу в инвентаре
+                    gpuInventory.splice(inventoryIndex, 1);
+                    updateUI();
+                    saveData();
+                    if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                }
+            });
         }
 
         function buyClickUpgrade() {
@@ -413,26 +439,18 @@
             }
         }
 
-        // Таймер: пассивный доход раз в секунду + плавная регенерация энергии
+        // Таймер пассивного дохода и восполнения энергии
         setInterval(() => {
-            // Майнинг
             btc += calculatePassiveIncome();
-            
-            // Восстановление энергии: 100 единиц за 30 секунд. 
-            // Значит, в 1 секунду восстанавливается 100 / 30 = 3.33 единицы.
             if (energy < 100) {
                 energy = Math.min(100, energy + (100 / 30));
             }
-
-            // Обновляем только текстовые счетчики каждую секунду, чтобы не перерисовывать весь DOM слотов
             document.getElementById('btc').innerText = btc.toFixed(2);
             document.getElementById('energy-val').innerText = Math.floor(energy);
             document.getElementById('energy-bar').style.width = `${energy}%`;
         }, 1000);
 
-        // Периодическое автосохранение на сервер (каждые 7 сек)
         setInterval(saveData, 7000);
-
         loadData();
     </script>
 </body>
